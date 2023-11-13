@@ -1,0 +1,28 @@
+php public/index.php - php fayni konsolda ishga tushirish
+
+php -S 0.0.0.0:8080 -t public public/index.php
+
+
+composer require roave/security-advisories:dev-master - eski xavf mavjud bo'lgan paketlar ro'yhatini olish
+
+composer dump-autoload - composer.json ga   "autoload": {
+                                              "psr-4": {
+                                                "Framework\\": "src/Framework/"
+                                              }
+                                            } ni qo'shgandan keyin ishlashi uchun dump-autoloadni yurgizish kerak
+
+composer require --dev phpunit/phpunit - PHPUnitni o'rnatish
+
+composer install - composer.json ichidagi require va require-dev bo'lgan paketlarni barchasini o'rnatib chiqadi.
+
+composer install --no-dev - composer.json ichidagi require-dev bo'lgan paketlarni o'rnatmaydi. Productionda ular kerakmas chunki.
+
+lsof -i :8080 - :8080 portidan kimlar foydalanayotganligini ko'rsatib beradi. U yerdan process id olinadi.
+
+kill -9 <PID> - <PID>ni to'xtatish.
+
+composer require psr/http-message - Response va Request uchun umumiy interfeyslarni yuklab olish
+
+composer require zendframework/zend-diactoros - Request va turli imkoniyatlar
+
+composer require aura/router - Routerlar uchun kutubxona
