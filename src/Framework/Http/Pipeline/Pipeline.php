@@ -14,18 +14,42 @@ class Pipeline
         $this->queue = new \SplQueue();
     }
 
+    public function __invoke(ServerRequestInterface $request, ResponseInterface $response, callable $next):ResponseInterface
+    {
+        $delegate = new Next(clone $this->queue, $next);
+
+        return $delegate($request, $response);
+    }
+
     public function pipe(callable $middleware)
     {
         $this->queue->enqueue($middleware);
     }
-
-    public function __invoke(ServerRequestInterface $request, callable $default):ResponseInterface
-    {
-        $delegate = new Next($this->queue, $default);
-
-        return $delegate($request);
-    }
 }
+
+
+//3-dars eski
+//class Pipeline
+//{
+//    private $queue;
+//
+//    public function __construct()
+//    {
+//        $this->queue = new \SplQueue();
+//    }
+//
+//    public function pipe(callable $middleware)
+//    {
+//        $this->queue->enqueue($middleware);
+//    }
+//
+//    public function __invoke(ServerRequestInterface $request, callable $default):ResponseInterface
+//    {
+//        $delegate = new Next($this->queue, $default);
+//
+//        return $delegate($request);
+//    }
+//}
 
 //class Pipeline
 //{

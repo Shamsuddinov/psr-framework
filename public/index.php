@@ -11,6 +11,7 @@ use Framework\Http\Pipeline\MiddlewareResolver;
 use Framework\Http\Pipeline\Pipeline;
 use Framework\Http\Router\AuraRouterAdapter;
 use Psr\Http\Message\ServerRequestInterface;
+use Zend\Diactoros\Response;
 use Zend\Diactoros\Response\HtmlResponse;
 use Zend\Diactoros\Response\SapiEmitter;
 use Zend\Diactoros\ServerRequestFactory;
@@ -276,7 +277,6 @@ $params  = [
 ];
 
 $aura = new \Aura\Router\RouterContainer();
-
 $routes = $aura->getMap();
 
 $routes->get('home', '/', new Action\BasicAuthActionDecorator(new Action\HomeAction(), $params['users'] ?? []));
@@ -311,8 +311,7 @@ $app->pipe(new \Framework\Http\Middleware\RouteMiddleware($router));
 $app->pipe(new \Framework\Http\Middleware\DispatchMiddleware($resolver));
 
 $request = ServerRequestFactory::fromGlobals();
-
-$response = $app->run($request);
+$response = $app->run($request, new Response());
 
 $emitter = new SapiEmitter();
 $emitter->emit($response);
