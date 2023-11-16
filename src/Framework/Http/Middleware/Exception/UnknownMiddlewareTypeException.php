@@ -6,8 +6,16 @@ use Psr\Http\Message\ServerRequestInterface;
 
 class UnknownMiddlewareTypeException extends \LogicException
 {
-    public function __construct(callable $handler)
+    private $type;
+
+    public function __construct(callable $type)
     {
         parent::__construct('Unknown middleware type!');
+        $this->type = $type;
+    }
+
+    public function getType()
+    {
+        return $this->type;
     }
 }
