@@ -3,7 +3,7 @@
 namespace App\Http\Middleware;
 
 use Psr\Http\Message\ServerRequestInterface;
-use Zend\Diactoros\Response\JsonResponse;
+use Laminas\Diactoros\Response\JsonResponse;
 
 class ErrorHandlerMiddleware
 {

@@ -10,11 +10,10 @@ use Framework\Http\Application;
 use Framework\Http\Pipeline\MiddlewareResolver;
 use Framework\Http\Pipeline\Pipeline;
 use Framework\Http\Router\AuraRouterAdapter;
+use Laminas\Diactoros\ServerRequestFactory;
 use Psr\Http\Message\ServerRequestInterface;
-use Zend\Diactoros\Response;
-use Zend\Diactoros\Response\HtmlResponse;
-use Zend\Diactoros\Response\SapiEmitter;
-use Zend\Diactoros\ServerRequestFactory;
+use Laminas\Diactoros\Response;
+use Laminas\Diactoros\Response\HtmlResponse;
 
 chdir(dirname(__DIR__));
 require 'vendor/autoload.php';
@@ -29,7 +28,7 @@ $aura = new \Aura\Router\RouterContainer();
 $routes = $aura->getMap();
 
 $routes->get('home', '/', Action\HomeAction::class);
-//$routes->get('about', '/about', new Action\BasicAuthActionDecorator(new Action\AboutAction(), $params['users'] ?? []));
+$routes->get('about', '/about', new Action\AboutAction());
 //$routes->get('cabinet', '/cabinet', new Action\BasicAuthActionDecorator(new Action\CabinetAction(), $params['users'] ?? []));
 //$routes->get('post', '/post', new Action\BasicAuthActionDecorator(new Action\CabinetAction(), $params['users'] ?? []));
 //$routes->get('blog', '/blog', new Action\BasicAuthActionDecorator(new Action\Blog\IndexAction, $params['users'] ?? []));
@@ -38,19 +37,19 @@ $routes->get('home', '/', Action\HomeAction::class);
 $router = new AuraRouterAdapter($aura);
 
 $resolver = new MiddlewareResolver();
-$app = new Application($resolver, new Middleware\NotFoundHandler());
+$app = new Application($resolver, new Middleware\NotFoundHandler(), new Response());
 
 
 $app->pipe(new Middleware\ErrorHandlerMiddleware($params['debug']));
-$app->pipe(Middleware\CredentialsMiddleware::class);
-$app->pipe(Middleware\ProfilerMiddleware::class);
+//$app->pipe(Middleware\CredentialsMiddleware::class);
+//$app->pipe(Middleware\ProfilerMiddleware::class);
 $app->pipe(new \Framework\Http\Middleware\RouteMiddleware($router));
 $app->pipe(new \Framework\Http\Middleware\DispatchMiddleware($resolver));
 
 $request = ServerRequestFactory::fromGlobals();
 $response = $app->run($request, new Response());
 
-$emitter = new SapiEmitter();
+$emitter = new Laminas\HttpHandlerRunner\Emitter\SapiEmitter();
 $emitter->emit($response);
 
 
