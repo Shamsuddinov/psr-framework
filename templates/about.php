@@ -1,18 +1,14 @@
-<?php /** @var string $name */ ?>
-
 <!DOCTYPE html>
 <html>
     <head>
-        <meta charset="UTF-8"/>
-        <title>Application</title>
-        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
         <meta charset="utf-8" />
         <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-        <title>Hello - App</title>
+        <title>About the site - App</title>
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css" />
         <style>
             body { padding-top: 70px; }
+            h1 { margin-top: 0 }
             .app { display: flex; min-height: 100vh; flex-direction: column; }
             .app-content { flex: 1; }
             .app-footer { padding-bottom: 1em; }
@@ -44,18 +40,16 @@
 
         <div class="app-content">
             <main class="container">
-                <div class="jumbotron">
-                    <h1>Hello!</h1>
-                    <p>
-                        Congratulations! You have successfully created your application.
-                    </p>
-                </div>
+                <ul class="breadcrumb">
+                    <li><a href="/">Home</a></li>
+                    <li class="active">About</li>
+                </ul>
+                <h1>About the site</h1>
             </main>
         </div>
 
         <footer class="app-footer">
             <div class="container">
-                <h1>Hello, <?= htmlspecialchars($name) ?>!</h1>
                 <hr />
                 <p>&copy; 2017 - My App.</p>
             </div>

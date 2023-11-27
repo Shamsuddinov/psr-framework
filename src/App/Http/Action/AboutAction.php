@@ -1,13 +1,20 @@
 <?php
 namespace App\Http\Action;
 
-use Psr\Http\Message\ServerRequestInterface;
+use Framework\Template\TemplateRenderer;
 use Zend\Diactoros\Response\HtmlResponse;
 
 class AboutAction
 {
-    public function __invoke(ServerRequestInterface $request): HtmlResponse
+    private $template;
+
+    public function __construct(TemplateRenderer $template)
     {
-        return new HtmlResponse('About page');
+        $this->template = $template;
+    }
+
+    public function __invoke()
+    {
+        return new HtmlResponse($this->template->render('about'));
     }
 }
