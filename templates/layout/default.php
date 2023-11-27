@@ -1,16 +1,19 @@
 <?php
-/** @var string $name */
+/**
+ * @var \Framework\Template\PhpRenderer $this
+ */
 ?>
 <!DOCTYPE html>
 <html>
     <head>
         <meta charset="utf-8" />
         <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-        <title>Cabinet - App</title>
+        <title><?= $this->params['title'] ?? '' ?> - App</title>
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css" />
         <style>
             body { padding-top: 70px; }
+            h1 { margin-top: 0 }
             .app { display: flex; min-height: 100vh; flex-direction: column; }
             .app-content { flex: 1; }
             .app-footer { padding-bottom: 1em; }
@@ -42,14 +45,12 @@
 
         <div class="app-content">
             <main class="container">
-
                 <ul class="breadcrumb">
                     <li><a href="/">Home</a></li>
-                    <li class="active">Cabinet</li>
+                    <li class="active">About</li>
                 </ul>
-
-                <h1>Cabinet of <?= htmlspecialchars($name, ENT_QUOTES | ENT_SUBSTITUTE) ?></h1>
-
+                <h1>About the site</h1>
+                <?= $content ?>
             </main>
         </div>
 
@@ -59,7 +60,6 @@
                 <p>&copy; 2017 - My App.</p>
             </div>
         </footer>
-
         <script src="https://code.jquery.com/jquery-2.1.4.min.js"></script>
         <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js"></script>
     </body>
