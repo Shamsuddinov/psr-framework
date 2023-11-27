@@ -15,7 +15,7 @@ class HelloAction
 
     public function __invoke()
     {
-        return new HtmlResponse($this->template->render('hello'));
+        return new HtmlResponse($this->template->render('app/hello'));
     }
 
 
