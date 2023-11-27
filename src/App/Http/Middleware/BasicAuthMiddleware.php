@@ -4,7 +4,7 @@ namespace App\Http\Middleware;
 
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
-use Laminas\Diactoros\Response\EmptyResponse;
+use Zend\Diactoros\Response\EmptyResponse;
 
 class BasicAuthMiddleware
 {

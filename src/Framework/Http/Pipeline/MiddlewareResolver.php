@@ -2,23 +2,32 @@
 
 namespace Framework\Http\Pipeline;
 
+use Framework\Container\Container;
 use Framework\Http\Middleware\Exception\UnknownMiddlewareTypeException;
-use Laminas\Stratigility\MiddlewarePipe;
+use Psr\Container\ContainerInterface;
+use Psr\Http\Server\MiddlewareInterface;
+use Zend\Stratigility\MiddlewarePipe;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
-use Psr\Http\Server\MiddlewareInterface;
 
 class MiddlewareResolver
 {
+    private $container;
+
+    public function __construct(ContainerInterface $container)
+    {
+        $this->container = $container;
+    }
+
     public function resolve($handler, ResponseInterface $responsePrototype): mixed
     {
         if (\is_array($handler)) {
             return $this->createPipe($handler, $responsePrototype);
         }
 
-        if (\is_string($handler)) {
-            return function (ServerRequestInterface $request, ResponseInterface $response, mixed $next) use ($handler) {
-                $middleware = $this->resolve(new $handler(), $response);
+        if (\is_string($handler) && $this->container->has($handler)) {
+            return function (ServerRequestInterface $request, ResponseInterface $response, mixed $next) use ($handler, $responsePrototype) {
+                $middleware = $this->resolve($this->container->get($handler), $responsePrototype);
                 return $middleware($request, $response, $next);
             };
         }

@@ -20,10 +20,10 @@ class DispatchMiddleware
     public function __invoke(ServerRequestInterface $request, ResponseInterface $response, callable $next)
     {
         try {
-            if (empty($result = $request->getAttribute(Result::class))){
-                return $next($request, $response);
+            if (!$result = $request->getAttribute(Result::class)){
+                return $next($request);
             }
-            $middleware = $this->resolver->resolve($result->getHandler());
+            $middleware = $this->resolver->resolve($result->getHandler(), $response);
 
             return $middleware($request, $response, $next);
         } catch (RequestNotMatchedException $exception){

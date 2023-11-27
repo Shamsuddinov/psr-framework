@@ -2,7 +2,7 @@
 namespace App\Http\Action\Blog;
 
 use Psr\Http\Message\ServerRequestInterface;
-use Laminas\Diactoros\Response\JsonResponse;
+use Zend\Diactoros\Response\JsonResponse;
 
 class ShowAction
 {

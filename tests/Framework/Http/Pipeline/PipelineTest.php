@@ -1,12 +1,13 @@
 <?php
 
-namespace Tests\App\Http\Pipeline;
+namespace Tests\Framework\Http\Pipeline;
 
 use Framework\Http\Pipeline\Pipeline;
-use PHPUnit\Framework\TestCase;
-use Psr\Http\Message\ServerRequestInterface;
 use Zend\Diactoros\Response\JsonResponse;
 use Zend\Diactoros\ServerRequest;
+use PHPUnit\Framework\TestCase;
+use Psr\Http\Message\ServerRequestInterface;
+
 
 class PipelineTest extends TestCase
 {

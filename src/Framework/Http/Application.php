@@ -3,35 +3,75 @@
 namespace Framework\Http;
 
 use Framework\Http\Pipeline\MiddlewareResolver;
-use Framework\Http\Pipeline\Pipeline;
-use Laminas\Stratigility\MiddlewarePipe;
+use Framework\Http\Router\RouteData;
+use Framework\Http\Router\Router;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
+use Zend\Stratigility\Middleware\PathMiddlewareDecorator;
+use Zend\Stratigility\MiddlewarePipe;
 
-class Application extends Pipeline
+class Application extends MiddlewarePipe
 {
     private $resolver;
+    private $router;
     private $default;
 
-    public function __construct(MiddlewareResolver $resolver, callable $default, ResponseInterface $responsePrototype)
+    public function __construct(MiddlewareResolver $resolver, Router $router, callable $default, ResponseInterface $responsePrototype)
     {
-        parent::__construct();
+//        parent::__con
         $this->resolver = $resolver;
-        $this->setResponsePrototype($responsePrototype);
+        $this->router = $router;
         $this->default = $default;
+        $this->pipeline = new MiddlewarePipe();
+//        $this->pipeline->setResponsePrototype($responsePrototype);
     }
 
     public function pipe($path, callable $middleware = null)
     {
         if ($middleware === null){
-            return parent::pipe($this->resolver->resolve($path,$this->responsePrototype));;
+            $this->pipeline->pipe($this->resolver->resolve($path));
         }
-        return parent::pipe($path, $this->resolver->resolve($middleware, $this->responsePrototype));
+        $this->pipeline->pipe(new PathMiddlewareDecorator($path, $this->resolver->resolve($middleware)));
+    }
+
+    private function route($name, $path, $handler, array $methods, array $options = []): void
+    {
+        $this->router->addRoute(new RouteData($name, $path, $handler, $methods, $options));
+    }
+
+    public function any($name, $path, $handler, array $options = []): void
+    {
+        $this->route($name, $path, $handler, $options);
+    }
+
+    public function get($name, $path, $handler, array $options = []): void
+    {
+        $this->route($name, $path, $handler, ['GET'], $options);
+    }
+
+    public function post($name, $path, $handler, array $options = []): void
+    {
+        $this->route($name, $path, $handler, ['POST'], $options);
+    }
+
+    public function put($name, $path, $handler, array $options = []): void
+    {
+        $this->route($name, $path, $handler, ['PUT'], $options);
+    }
+
+    public function patch($name, $path, $handler, array $options = []): void
+    {
+        $this->route($name, $path, $handler, ['PATCH'], $options);
+    }
+
+    public function delete($name, $path, $handler, array $options = []): void
+    {
+        $this->route($name, $path, $handler, ['DELETE'], $options);
     }
 
     public function run(ServerRequestInterface $request, ResponseInterface $response)
     {
-        return $this($request, $response, $this->default);
+//        return $this($request, $response, $this->default);
     }
 }
 

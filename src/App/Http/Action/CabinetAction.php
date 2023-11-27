@@ -3,7 +3,7 @@ namespace App\Http\Action;
 
 use App\Http\Middleware\BasicAuthMiddleware;
 use Psr\Http\Message\ServerRequestInterface;
-use Laminas\Diactoros\Response\HtmlResponse;
+use Zend\Diactoros\Response\HtmlResponse;
 
 class CabinetAction
 {

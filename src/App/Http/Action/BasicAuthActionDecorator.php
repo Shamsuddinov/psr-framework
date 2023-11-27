@@ -4,7 +4,7 @@ namespace App\Http\Action;
 
 use App\Http\Middleware\BasicAuthMiddleware;
 use Psr\Http\Message\ServerRequestInterface;
-use Laminas\Diactoros\Response\EmptyResponse;
+use Zend\Diactoros\Response\EmptyResponse;
 
 class BasicAuthActionDecorator
 {

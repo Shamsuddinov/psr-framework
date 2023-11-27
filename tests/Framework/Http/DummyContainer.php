@@ -2,10 +2,10 @@
 
 namespace Tests\Framework\Http;
 
-use Psr\Container\ContainerInterface;
-use Zend\ServiceManager\Exception\ServiceNotFoundException;
+use Framework\Container\Container;
+use Framework\Container\ServiceNotFoundException;
 
-class DummyContainer implements ContainerInterface
+class DummyContainer extends Container
 {
     public function get($id)
     {

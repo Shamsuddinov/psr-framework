@@ -2,6 +2,8 @@
 
 namespace Framework\Http\Router;
 
+use Aura\Router\Exception\ImmutableProperty;
+use Aura\Router\Exception\RouteAlreadyExists;
 use Aura\Router\Exception\RouteNotFound;
 use Aura\Router\RouterContainer;
 use Framework\Http\Router\Exception\RequestNotMatchedException;
@@ -40,5 +42,41 @@ class AuraRouterAdapter implements Router
         } catch (RouteNotFound $exception){
             throw new RouteNotFoundException($name, $params, $exception);
         }
+    }
+
+    /**
+     * @throws RouteAlreadyExists
+     * @throws ImmutableProperty
+     */
+    public function addRoute(RouteData $data): void
+    {
+        $map = $this->aura->getMap();
+
+        $route = new \Aura\Router\Route();
+        $route->name($data->name);
+        $route->path($data->path);
+        $route->handler($data->handler);
+
+        foreach ($data->options as $name => $value) {
+            switch ($name) {
+                case 'tokens':
+                    $route->tokens($value);
+                    break;
+                case 'defaults':
+                    $route->defaults($value);
+                    break;
+                case 'wildcard':
+                    $route->wildcard($value);
+                    break;
+                default:
+                    throw new \InvalidArgumentException('Undefined option "' . $name . '"');
+            }
+        }
+
+        if ($methods = $data->methods) {
+            $route->allows($methods);
+        }
+
+        $map->addRoute($route);
     }
 }

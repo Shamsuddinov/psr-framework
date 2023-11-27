@@ -26,3 +26,14 @@ composer require psr/http-message - Response va Request uchun umumiy interfeysla
 composer require zendframework/zend-diactoros - Request va turli imkoniyatlar
 
 composer require aura/router - Routerlar uchun kutubxona
+
+
+ob_start(); - Bufferni yoqish
+
+ob_clean(); - Bufferni tozalash
+
+ob_get_contents(); - bufferdagini olish
+
+// $params = ['name' => 'Abbosxon'];
+// EXTR_OVERWRITE, EXTR_IF_EXISTS, EXTR_SKIP ...
+extract($params, EXTR_OVERWRITE); - $paramsda berilgan parametrlarga qarab o'zgaruvchilarni yaratib beradi.

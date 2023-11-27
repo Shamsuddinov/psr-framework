@@ -3,16 +3,16 @@
 namespace Tests\Framework\Http\Pipeline;
 
 use Framework\Http\Pipeline\MiddlewareResolver;
+use Zend\Diactoros\ServerRequest;
 use PHPUnit\Framework\TestCase;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\MiddlewareInterface;
 use Psr\Http\Server\RequestHandlerInterface;
 use Tests\Framework\Http\DummyContainer;
-use Laminas\Diactoros\Response;
-use Laminas\Diactoros\Response\EmptyResponse;
-use Laminas\Diactoros\Response\HtmlResponse;
-use Zend\Diactoros\ServerRequest;
+use Zend\Diactoros\Response;
+use Zend\Diactoros\Response\EmptyResponse;
+use Zend\Diactoros\Response\HtmlResponse;
 
 class MiddlewareResolverTest extends TestCase
 {
@@ -22,13 +22,13 @@ class MiddlewareResolverTest extends TestCase
      */
     public function testDirect($handler): void
     {
-        $resolver = new MiddlewareResolver();
-        $middleware = $resolver->resolve($handler);
+        $resolver = new MiddlewareResolver(new DummyContainer());
+        $middleware = $resolver->resolve($handler, new Response());
 
         $response = $middleware(
             (new ServerRequest())->withAttribute('attribute', $value = 'value'),
             new Response(),
-            new NotFoundHandler()
+            new NotFoundMiddleware()
         );
 
         self::assertEquals([$value], $response->getHeader('X-Header'));
@@ -40,13 +40,13 @@ class MiddlewareResolverTest extends TestCase
      */
     public function testNext($handler): void
     {
-        $resolver = new MiddlewareResolver();
-        $middleware = $resolver->resolve($handler);
+        $resolver = new MiddlewareResolver(new DummyContainer());
+        $middleware = $resolver->resolve($handler, new Response());
 
         $response = $middleware(
             (new ServerRequest())->withAttribute('next', true),
             new Response(),
-            new NotFoundHandler()
+            new NotFoundMiddleware()
         );
 
         self::assertEquals(404, $response->getStatusCode());
@@ -83,14 +83,14 @@ class MiddlewareResolverTest extends TestCase
      */
     public function testHandler(): void
     {
-        $resolver = new MiddlewareResolver();
+        $resolver = new MiddlewareResolver(new DummyContainer());
 
-        $middleware = $resolver->resolve(PsrHandler::class);
+        $middleware = $resolver->resolve(PsrHandler::class, new Response());
 
         $response = $middleware(
             (new ServerRequest())->withAttribute('attribute', $value = 'value'),
             new Response(),
-            new NotFoundHandler()
+            new NotFoundMiddleware()
         );
 
         self::assertEquals([$value], $response->getHeader('X-Header'));
@@ -98,18 +98,18 @@ class MiddlewareResolverTest extends TestCase
 
     public function testArray(): void
     {
-        $resolver = new MiddlewareResolver();
+        $resolver = new MiddlewareResolver(new DummyContainer());
 
         $middleware = $resolver->resolve([
             new DummyMiddleware(),
             new CallableMiddleware()
-        ]);
+        ], new Response());
 
         /** @var ResponseInterface $response */
         $response = $middleware(
             (new ServerRequest())->withAttribute('attribute', $value = 'value'),
             new Response(),
-            new NotFoundHandler()
+            new NotFoundMiddleware()
         );
 
         self::assertEquals(['dummy'], $response->getHeader('X-Dummy'));
@@ -174,9 +174,9 @@ class PsrHandler implements RequestHandlerInterface
     }
 }
 
-class NotFoundHandler implements RequestHandlerInterface
+class NotFoundMiddleware
 {
-    public function handle(ServerRequestInterface $request): ResponseInterface
+    public function __invoke(ServerRequestInterface $request)
     {
         return new EmptyResponse(404);
     }

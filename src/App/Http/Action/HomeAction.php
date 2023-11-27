@@ -2,7 +2,7 @@
 namespace App\Http\Action;
 
 use Psr\Http\Message\ServerRequestInterface;
-use Laminas\Diactoros\Response\HtmlResponse;
+use Zend\Diactoros\Response\HtmlResponse;
 
 class HomeAction
 {

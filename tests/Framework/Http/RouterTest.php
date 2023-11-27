@@ -4,12 +4,9 @@ namespace Tests\Framework\Http;
 
 use Framework\Http\Router\AuraRouterAdapter;
 use Framework\Http\Router\Exception\RequestNotMatchedException;
-use Framework\Http\Router\RouteCollection;
-use Framework\Http\Router\Router;
-use http\Exception\InvalidArgumentException;
-use PHPUnit\Framework\TestCase;
 use Zend\Diactoros\ServerRequest;
 use Zend\Diactoros\Uri;
+use PHPUnit\Framework\TestCase;
 
 class RouterTest extends TestCase
 {

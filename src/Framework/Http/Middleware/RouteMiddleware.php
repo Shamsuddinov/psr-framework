@@ -27,9 +27,9 @@ class RouteMiddleware
                 $request = $request->withAttribute($attribute, $value);
             }
 
-            return $next($request->withAttribute(Result::class, $result), $response);
+            return $next($request->withAttribute(Result::class, $result));
         } catch (RequestNotMatchedException $exception){
-            return $next($request, $response);
+            return $next($request);
         }
     }
 }

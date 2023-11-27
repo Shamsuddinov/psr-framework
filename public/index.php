@@ -3,54 +3,97 @@
 //use Framework\Http\RequestFactory;
 //use Framework\Http\Response;
 
-
-use App\Http\Action;
-use App\Http\Middleware;
 use Framework\Http\Application;
-use Framework\Http\Pipeline\MiddlewareResolver;
-use Framework\Http\Pipeline\Pipeline;
-use Framework\Http\Router\AuraRouterAdapter;
-use Laminas\Diactoros\ServerRequestFactory;
-use Psr\Http\Message\ServerRequestInterface;
-use Laminas\Diactoros\Response;
-use Laminas\Diactoros\Response\HtmlResponse;
+use Zend\Diactoros\Response;
+use Zend\Diactoros\Response\SapiEmitter;
+use Zend\Diactoros\ServerRequestFactory;
 
 chdir(dirname(__DIR__));
 require 'vendor/autoload.php';
 
 
-$params  = [
-    'users' => ['admin' => 'password'],
-    'debug' => true
-];
+/** @var \Psr\Container\ContainerInterface $container */
+$container = require 'config/container.php';
+$app = $container->get(Application::class);
 
-$aura = new \Aura\Router\RouterContainer();
-$routes = $aura->getMap();
+require 'config/pipeline.php';
+require 'config/routes.php';
 
-$routes->get('home', '/', Action\HomeAction::class);
-$routes->get('about', '/about', new Action\AboutAction());
-//$routes->get('cabinet', '/cabinet', new Action\BasicAuthActionDecorator(new Action\CabinetAction(), $params['users'] ?? []));
-//$routes->get('post', '/post', new Action\BasicAuthActionDecorator(new Action\CabinetAction(), $params['users'] ?? []));
-//$routes->get('blog', '/blog', new Action\BasicAuthActionDecorator(new Action\Blog\IndexAction, $params['users'] ?? []));
-//$routes->get('blog_show', '/blog/{id}', new Action\BasicAuthActionDecorator(new Action\Blog\ShowAction, $params['users'] ?? []))->tokens(['id' => '\d+']);
-
-$router = new AuraRouterAdapter($aura);
-
-$resolver = new MiddlewareResolver();
-$app = new Application($resolver, new Middleware\NotFoundHandler(), new Response());
-
-
-$app->pipe(new Middleware\ErrorHandlerMiddleware($params['debug']));
-//$app->pipe(Middleware\CredentialsMiddleware::class);
-//$app->pipe(Middleware\ProfilerMiddleware::class);
-$app->pipe(new \Framework\Http\Middleware\RouteMiddleware($router));
-$app->pipe(new \Framework\Http\Middleware\DispatchMiddleware($resolver));
 
 $request = ServerRequestFactory::fromGlobals();
 $response = $app->run($request, new Response());
 
-$emitter = new Laminas\HttpHandlerRunner\Emitter\SapiEmitter();
+$emitter = new SapiEmitter();
 $emitter->emit($response);
+
+// 4-dars boshi
+//$container = new Container();
+//
+//$container->set('debug', true);
+//$container->set('users', ['admin' => 'password']);
+//$container->set('db', new \PDO('mysql:host=localhost;dbname=dbname', 'username', 'password'));
+//
+//$aura = new \Aura\Router\RouterContainer();
+//$routes = $aura->getMap();
+//
+//$routes->get('home', '/', Action\HomeAction::class);
+//$routes->get('about', '/about', new Action\AboutAction());
+////$routes->get('cabinet', '/cabinet', new Action\BasicAuthActionDecorator(new Action\CabinetAction(), $params['users'] ?? []));
+////$routes->get('post', '/post', new Action\BasicAuthActionDecorator(new Action\CabinetAction(), $params['users'] ?? []));
+////$routes->get('blog', '/blog', new Action\BasicAuthActionDecorator(new Action\Blog\IndexAction, $params['users'] ?? []));
+////$routes->get('blog_show', '/blog/{id}', new Action\BasicAuthActionDecorator(new Action\Blog\ShowAction, $params['users'] ?? []))->tokens(['id' => '\d+']);
+//
+//$router = new AuraRouterAdapter($aura);
+//
+//$resolver = new MiddlewareResolver();
+//$app = new Application($resolver, new Middleware\NotFoundHandler(), new Response());
+//
+//
+//$app->pipe(new Middleware\ErrorHandlerMiddleware($params['debug']));
+////$app->pipe(Middleware\CredentialsMiddleware::class);
+////$app->pipe(Middleware\ProfilerMiddleware::class);
+//$app->pipe(new \Framework\Http\Middleware\RouteMiddleware($router));
+//$app->pipe(new \Framework\Http\Middleware\DispatchMiddleware($resolver));
+//
+//$request = ServerRequestFactory::fromGlobals();
+//$response = $app->run($request, new Response());
+//
+//$emitter = new Laminas\HttpHandlerRunner\Emitter\SapiEmitter();
+//$emitter->emit($response);
+
+// 3-dars
+//$params  = [
+//    'users' => ['admin' => 'password'],
+//    'debug' => true
+//];
+//
+//$aura = new \Aura\Router\RouterContainer();
+//$routes = $aura->getMap();
+//
+//$routes->get('home', '/', Action\HomeAction::class);
+//$routes->get('about', '/about', new Action\AboutAction());
+////$routes->get('cabinet', '/cabinet', new Action\BasicAuthActionDecorator(new Action\CabinetAction(), $params['users'] ?? []));
+////$routes->get('post', '/post', new Action\BasicAuthActionDecorator(new Action\CabinetAction(), $params['users'] ?? []));
+////$routes->get('blog', '/blog', new Action\BasicAuthActionDecorator(new Action\Blog\IndexAction, $params['users'] ?? []));
+////$routes->get('blog_show', '/blog/{id}', new Action\BasicAuthActionDecorator(new Action\Blog\ShowAction, $params['users'] ?? []))->tokens(['id' => '\d+']);
+//
+//$router = new AuraRouterAdapter($aura);
+//
+//$resolver = new MiddlewareResolver();
+//$app = new Application($resolver, new Middleware\NotFoundHandler(), new Response());
+//
+//
+//$app->pipe(new Middleware\ErrorHandlerMiddleware($params['debug']));
+////$app->pipe(Middleware\CredentialsMiddleware::class);
+////$app->pipe(Middleware\ProfilerMiddleware::class);
+//$app->pipe(new \Framework\Http\Middleware\RouteMiddleware($router));
+//$app->pipe(new \Framework\Http\Middleware\DispatchMiddleware($resolver));
+//
+//$request = ServerRequestFactory::fromGlobals();
+//$response = $app->run($request, new Response());
+//
+//$emitter = new Laminas\HttpHandlerRunner\Emitter\SapiEmitter();
+//$emitter->emit($response);
 
 
 
