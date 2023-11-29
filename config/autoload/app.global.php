@@ -1,43 +1,47 @@
 <?php
 
-
+use App\Http\Middleware;
 use Framework\Http\Application;
 use Framework\Http\Pipeline\MiddlewareResolver;
 use Framework\Http\Router\AuraRouterAdapter;
 use Framework\Http\Router\Router;
+use Framework\Template\Php\PhpRenderer;
 use Framework\Template\TemplateRenderer;
 use Psr\Container\ContainerInterface;
-use Zend\ServiceManager\AbstractFactory\ReflectionBasedAbstractFactory;
-use \App\Http\Middleware;
 
 return [
     'dependencies' => [
         'abstract_factories' => [
-            ReflectionBasedAbstractFactory::class,
+            Zend\ServiceManager\AbstractFactory\ReflectionBasedAbstractFactory::class,
         ],
         'factories' => [
             Application::class => function (ContainerInterface $container) {
-                $app = new Application(
+                return new Application(
                     $container->get(MiddlewareResolver::class),
                     $container->get(Router::class),
-                    new Middleware\NotFoundHandler(),
+                    $container->get(Middleware\NotFoundHandler::class),
                     new Zend\Diactoros\Response()
                 );
-                $app->setLogger($container->get(\Psr\Log\LoggerInterface::class));
             },
             Router::class => function () {
-                return new AuraRouterAdapter(new \Aura\Router\RouterContainer());
+                return new AuraRouterAdapter(new Aura\Router\RouterContainer());
             },
             MiddlewareResolver::class => function (ContainerInterface $container) {
                 return new MiddlewareResolver($container);
             },
             Middleware\ErrorHandlerMiddleware::class => function (ContainerInterface $container) {
-                return new Middleware\ErrorHandlerMiddleware($container->get('config')['debug']);
+                return new Middleware\ErrorHandlerMiddleware(
+                    $container->get('config')['debug'],
+                    $container->get(TemplateRenderer::class)
+                );
             },
-            TemplateRenderer::class => function () {
-                return new TemplateRenderer('templates');
+            TemplateRenderer::class => function (ContainerInterface $container) {
+                $renderer = new PhpRenderer('templates');
+                $renderer->addExtension($container->get(RouteExtension::class));
+                return $renderer;
             },
-        ]
+        ],
     ],
+
     'debug' => false,
 ];

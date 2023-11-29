@@ -2,14 +2,27 @@
 namespace App\Http\Action\Blog;
 
 use Psr\Http\Message\ServerRequestInterface;
-use Zend\Diactoros\Response\JsonResponse;
+use App\ReadModel\PostReadRepository;
+use Framework\Template\TemplateRenderer;
+use Zend\Diactoros\Response\HtmlResponse;
 
 class IndexAction
 {
-    public function __invoke(ServerRequestInterface $request): JsonResponse
+    private $posts;
+    private $template;
+
+    public function __construct(PostReadRepository $posts, TemplateRenderer $template)
     {
-        return new JsonResponse([
-            ['id' => 1, 'name' => 'Food']
-        ]);
+        $this->posts = $posts;
+        $this->template = $template;
+    }
+
+    public function __invoke(ServerRequestInterface $request): HtmlResponse
+    {
+        $posts = $this->posts->getAll();
+
+        return new HtmlResponse($this->template->render('app/blog/index', [
+            'posts' => $posts,
+        ]));
     }
 }

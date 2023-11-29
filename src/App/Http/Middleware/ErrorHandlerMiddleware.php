@@ -2,16 +2,19 @@
 
 namespace App\Http\Middleware;
 
+use Framework\Template\TemplateRenderer;
 use Psr\Http\Message\ServerRequestInterface;
-use Zend\Diactoros\Response\JsonResponse;
+use Zend\Diactoros\Response\HtmlResponse;
 
 class ErrorHandlerMiddleware
 {
     private $debug;
+    private $template;
 
-    public function __construct($debug)
+    public function __construct(bool $debug, TemplateRenderer $template)
     {
         $this->debug = $debug;
+        $this->template = $template;
     }
 
     public function __invoke(ServerRequestInterface $request, callable $next)
@@ -19,13 +22,11 @@ class ErrorHandlerMiddleware
         try {
             return $next($request);
         } catch (\Throwable $throwable){
-            if ($this->debug){
-                return new JsonResponse([
-                    'error' => 'Server side error',
-                    'code' => $throwable->getCode(),
-                    'message' => $throwable->getMessage(),
-                ]);
-            }
+            $view = $this->debug ? 'error/error-debug' : 'error/error';
+            return new HtmlResponse($this->template->render($view, [
+                'request' => $request,
+                'exception' => $throwable,
+            ]), $throwable->getCode() ?: 500);
         }
     }
 }
