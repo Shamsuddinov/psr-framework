@@ -5,33 +5,36 @@ namespace Framework\Http;
 use Framework\Http\Pipeline\MiddlewareResolver;
 use Framework\Http\Router\RouteData;
 use Framework\Http\Router\Router;
+use Interop\Http\Server\MiddlewareInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
-use Zend\Stratigility\Middleware\PathMiddlewareDecorator;
+use Webimpress\HttpMiddlewareCompatibility\HandlerInterface as RequestHandlerInterface;
 use Zend\Stratigility\MiddlewarePipe;
 
-class Application extends MiddlewarePipe
+class Application implements MiddlewareInterface, RequestHandlerInterface
 {
     private $resolver;
     private $router;
     private $default;
+    private $pipeline;
+    private $responsePrototype;
 
     public function __construct(MiddlewareResolver $resolver, Router $router, callable $default, ResponseInterface $responsePrototype)
     {
-//        parent::__con
         $this->resolver = $resolver;
         $this->router = $router;
-        $this->default = $default;
         $this->pipeline = new MiddlewarePipe();
-//        $this->pipeline->setResponsePrototype($responsePrototype);
+        $this->pipeline->setResponsePrototype($responsePrototype);
+        $this->default = $default;
+        $this->responsePrototype = $responsePrototype;
     }
 
-    public function pipe($path, callable $middleware = null)
+    public function pipe($path, $middleware = null): MiddlewarePipe
     {
-        if ($middleware === null){
-            $this->pipeline->pipe($this->resolver->resolve($path));
+        if ($middleware === null) {
+            return $this->pipeline->pipe($this->resolver->resolve($path, $this->responsePrototype));
         }
-        $this->pipeline->pipe(new PathMiddlewareDecorator($path, $this->resolver->resolve($middleware)));
+        return $this->pipeline->pipe($path, $this->resolver->resolve($middleware, $this->responsePrototype));
     }
 
     private function route($name, $path, $handler, array $methods, array $options = []): void
@@ -69,9 +72,19 @@ class Application extends MiddlewarePipe
         $this->route($name, $path, $handler, ['DELETE'], $options);
     }
 
-    public function run(ServerRequestInterface $request, ResponseInterface $response)
+    public function handle(ServerRequestInterface $request): ResponseInterface
     {
-//        return $this($request, $response, $this->default);
+        return ($this->pipeline)($request, $this->responsePrototype, $this->default);
+    }
+
+    public function __invoke(ServerRequestInterface $request, ResponseInterface $response, callable $next): ResponseInterface
+    {
+        return ($this->pipeline)($request, $response, $next);
+    }
+
+    public function process(ServerRequestInterface $request, RequestHandlerInterface $handler): ResponseInterface
+    {
+        return $this->pipeline->process($request, $handler);
     }
 }
 
