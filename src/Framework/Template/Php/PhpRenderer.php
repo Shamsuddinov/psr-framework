@@ -108,14 +108,20 @@ class PhpRenderer implements TemplateRenderer
     public function encode($string): string
     {
         return htmlspecialchars($string, ENT_QUOTES | ENT_SUBSTITUTE);
+
     }
 
     public function __call($name, $arguments)
     {
         foreach ($this->extensions as $extension) {
             $functions = $extension->getFunctions();
-            if (array_key_exists($name, $functions)) {
-                return $functions[$name](...$arguments);
+            foreach ($functions as $function) {
+                if ($function->name === $name) {
+                    if ($function->needRenderer) {
+                        return ($function->callback)($this, ...$arguments);
+                    }
+                    return ($function->callback)(...$arguments);
+                }
             }
         }
         throw new \InvalidArgumentException('Undefined function "' . $name . '"');
