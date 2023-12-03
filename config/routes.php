@@ -6,9 +6,9 @@ use App\Http\Action;
  * @var \Framework\Http\Application $app
  */
 
-$app->get('home', '/', Action\HomeAction::class);
+$app->get('home', '/', Action\HelloAction::class);
 $app->get('about', '/about', Action\AboutAction::class);
-//$app->get('cabinet', '/cabinet', new Action\BasicAuthActionDecorator(new Action\CabinetAction(), $params['users'] ?? []));
-//$app->get('post', '/post', new Action\BasicAuthActionDecorator(new Action\CabinetAction(), $params['users'] ?? []));
-//$app->get('blog', '/blog', new Action\BasicAuthActionDecorator(new Action\Blog\IndexAction, $params['users'] ?? []));
-//$app->get('blog_show', '/blog/{id}', new Action\BasicAuthActionDecorator(new Action\Blog\ShowAction, $params['users'] ?? []))->tokens(['id' => '\d+']);
+$app->get('cabinet', '/cabinet', Action\CabinetAction::class);
+$app->get('blog', '/blog', Action\Blog\IndexAction::class);
+$app->get('blog_page', '/blog/page/{page}', Action\Blog\IndexAction::class, ['tokens' => ['page' => '\d+']]);
+$app->get('blog_show', '/blog/{id}', Action\Blog\ShowAction::class, ['tokens' => ['id' => '\d+']]);

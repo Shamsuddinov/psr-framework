@@ -8,6 +8,7 @@ use Framework\Http\Router\Router;
 use PHPUnit\Framework\TestCase;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
+use Psr\Http\Server\RequestHandlerInterface;
 use Zend\Diactoros\Response;
 use Zend\Diactoros\Response\JsonResponse;
 use Zend\Diactoros\ServerRequest;
@@ -26,7 +27,7 @@ class ApplicationTest extends TestCase
     public function setUp()
     {
         parent::setUp();
-        $this->resolver = new MiddlewareResolver(new DummyContainer());
+        $this->resolver = new MiddlewareResolver(new DummyContainer(), new Response());
         $this->router = $this->createMock(Router::class);
     }
 
@@ -59,9 +60,9 @@ class Middleware2
         return $next($request->withAttribute('middleware-2', 2));
     }
 }
-class DefaultHandler
+class DefaultHandler implements RequestHandlerInterface
 {
-    public function __invoke(ServerRequestInterface $request)
+    public function handle(ServerRequestInterface $request): ResponseInterface
     {
         return new JsonResponse($request->getAttributes());
     }

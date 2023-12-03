@@ -25,7 +25,7 @@ class BasicAuthMiddleware
         if (!empty($username) && !empty($password)) {
             foreach ($this->users as $name => $pass) {
                 if ($username == $name && $password == $pass) {
-                    return $next($request->withAttribute(self::ATTRIBUTE, $username));
+                    return $next($request->withAttribute(self::ATTRIBUTE, $name), $response);
                 }
             }
         }
