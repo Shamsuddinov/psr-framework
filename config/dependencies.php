@@ -1,6 +1,6 @@
 <?php
 
-use Framework\Container\Container;
+use App\Http\Middleware;
 use Framework\Http\Application;
 use Framework\Http\Middleware\DispatchMiddleware;
 use Framework\Http\Middleware\RouteMiddleware;
@@ -9,7 +9,6 @@ use Framework\Http\Router\AuraRouterAdapter;
 use Framework\Http\Router\Router;
 use Psr\Container\ContainerInterface;
 use Zend\Diactoros\Response;
-use App\Http\Middleware;
 
 /**
  * @var ContainerInterface $container
@@ -37,8 +36,8 @@ $container->set(Middleware\BasicAuthMiddleware::class, function (ContainerInterf
     return new Middleware\BasicAuthMiddleware($container->get('config')['user']);
 });
 
-$container->set(Middleware\ErrorHandlerMiddleware::class, function (ContainerInterface $container){
-    return new Middleware\ErrorHandlerMiddleware($container->get('config')['debug']);
+$container->set(Middleware\ErrorHandler\ErrorHandlerMiddleware::class, function (ContainerInterface $container){
+    return new Middleware\ErrorHandler\ErrorHandlerMiddleware($container->get('config')['debug']);
 });
 
 $container->set(DispatchMiddleware::class, function (ContainerInterface $container){
