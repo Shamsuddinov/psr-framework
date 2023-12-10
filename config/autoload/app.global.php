@@ -1,10 +1,10 @@
 <?php
 
 use App\Http\Middleware;
-use App\Http\Middleware\ErrorHandler\ErrorHandlerMiddleware;
-use App\Http\Middleware\ErrorHandler\ErrorResponseGenerator;
-use App\Http\Middleware\ErrorHandler\PrettyErrorResponseGenerator;
 use Framework\Http\Application;
+use Framework\Http\Middleware\ErrorHandler\ErrorHandlerMiddleware;
+use Framework\Http\Middleware\ErrorHandler\ErrorResponseGenerator;
+use Framework\Http\Middleware\ErrorHandler\PrettyErrorResponseGenerator;
 use Framework\Http\Pipeline\MiddlewareResolver;
 use Framework\Http\Router\AuraRouterAdapter;
 use Framework\Http\Router\Router;
@@ -39,10 +39,38 @@ return [
                 );
             },
             ErrorResponseGenerator::class => function (ContainerInterface $container) {
+                if ($container->get('config')['debug']){
+                    return new \Framework\Http\Middleware\ErrorHandler\WhoopsErrorResponseGenerator(
+                        $container->get(TemplateRenderer::class),
+                        new Zend\Diactoros\Response(),
+                     );
+                }
                 return new PrettyErrorResponseGenerator(
-                    $container->get('config')['debug'],
-                    $container->get(TemplateRenderer::class)
+                    $container->get(TemplateRenderer::class),
+                    new Zend\Diactoros\Response(),
+                    [
+                        '403' => 'error/403',
+                        '404' => 'error/404',
+                        'error' => 'error/error',
+                    ]
                 );
+            },
+            Psr\Log\LoggerInterface::class => function (ContainerInterface $container) {
+                $logger = new Monolog\Logger('App');
+                $logger->pushHandler(new Monolog\Handler\StreamHandler(
+                    'var/log/application.log',
+                    $container->get('config')['debug'] ? Monolog\Logger::DEBUG : Monolog\Logger::WARNING
+                ));
+
+                return $logger;
+            },
+            Whoops\RunInterface::class => function () {
+                $whoops = new Whoops\Run();
+                $whoops->writeToOutput(false);
+                $whoops->allowQuit(false);
+                $whoops->pushHandler(new Whoops\Handler\PrettyPageHandler());
+                $whoops->register();
+                return $whoops;
             },
             TemplateRenderer::class => function (ContainerInterface $container) {
                 return new TwigRenderer($container->get(Twig\Environment::class), '.html.twig');

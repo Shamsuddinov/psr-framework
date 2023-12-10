@@ -36,8 +36,8 @@ $container->set(Middleware\BasicAuthMiddleware::class, function (ContainerInterf
     return new Middleware\BasicAuthMiddleware($container->get('config')['user']);
 });
 
-$container->set(Middleware\ErrorHandler\ErrorHandlerMiddleware::class, function (ContainerInterface $container){
-    return new Middleware\ErrorHandler\ErrorHandlerMiddleware($container->get('config')['debug']);
+$container->set(\Framework\Http\Middleware\ErrorHandler\ErrorHandlerMiddleware::class, function (ContainerInterface $container){
+    return new \Framework\Http\Middleware\ErrorHandler\ErrorHandlerMiddleware($container->get('config')['debug']);
 });
 
 $container->set(DispatchMiddleware::class, function (ContainerInterface $container){

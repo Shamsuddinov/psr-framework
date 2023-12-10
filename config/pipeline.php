@@ -7,7 +7,7 @@ use Framework\Http\Application;
  * @var Application $app
  */
 
-$app->pipe(Middleware\ErrorHandler\ErrorHandlerMiddleware::class);
+$app->pipe(\Framework\Http\Middleware\ErrorHandler\ErrorHandlerMiddleware::class);
 $app->pipe(Middleware\CredentialsMiddleware::class);
 $app->pipe(Middleware\ProfilerMiddleware::class);
 $app->pipe(\Framework\Http\Middleware\RouteMiddleware::class);
