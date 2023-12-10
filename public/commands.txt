@@ -37,3 +37,12 @@ ob_get_contents(); - bufferdagini olish
 // $params = ['name' => 'Abbosxon'];
 // EXTR_OVERWRITE, EXTR_IF_EXISTS, EXTR_SKIP ...
 extract($params, EXTR_OVERWRITE); - $paramsda berilgan parametrlarga qarab o'zgaruvchilarni yaratib beradi.
+
+***************************
+- ANALYZER
+
+composer global require "squizlabs/php_codesniffer=*"
+analyser - ~/.composer/vendor/bin/phpcs src
+prettier - ~/.composer/vendor/bin/phpcbf
+
+****************************

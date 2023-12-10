@@ -24,7 +24,8 @@ class Response
         $this->statusCode = $statusCode;
     }
 
-    public function getBody(){
+    public function getBody()
+    {
         return $this->body;
     }
 
@@ -35,7 +36,8 @@ class Response
         return $new;
     }
 
-    public function getStatusCode(){
+    public function getStatusCode()
+    {
         return $this->statusCode;
     }
 
@@ -49,7 +51,7 @@ class Response
 
     public function getReasonPhrase(): string
     {
-        if (!$this->reasonPhrase && isset(self::$phrases[$this->statusCode])){
+        if (!$this->reasonPhrase && isset(self::$phrases[$this->statusCode])) {
             $this->reasonPhrase = self::$phrases[$this->statusCode];
         }
         return $this->reasonPhrase;
@@ -64,7 +66,7 @@ class Response
 
     public function getHeader($header): ?array
     {
-        if (!$this->hasHeader($header)){
+        if (!$this->hasHeader($header)) {
             return null;
         }
         return $this->headers[$header];
@@ -84,7 +86,7 @@ class Response
     {
         $new = clone $this;
 
-        if ($new->hasHeader($header)){
+        if ($new->hasHeader($header)) {
             unset($new->headers[$header]);
         }
 

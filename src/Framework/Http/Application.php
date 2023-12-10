@@ -25,8 +25,7 @@ class Application implements MiddlewareInterface, RequestHandlerInterface
         Router $router,
         RequestHandlerInterface $default,
         ResponseInterface $responsePrototype
-    )
-    {
+    ) {
         $this->resolver = $resolver;
         $this->router = $router;
         $this->pipeline = new MiddlewarePipe();

@@ -21,8 +21,8 @@ class ErrorHandlerMiddleware implements MiddlewareInterface
     {
         try {
             return $handler->handle($request);
-        } catch (\Throwable $throwable){
-            foreach ($this->listeners as $listener){
+        } catch (\Throwable $throwable) {
+            foreach ($this->listeners as $listener) {
                 $listener($throwable, $request);
             }
 

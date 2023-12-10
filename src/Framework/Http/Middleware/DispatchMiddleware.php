@@ -21,7 +21,7 @@ class DispatchMiddleware implements MiddlewareInterface
 
     public function process(ServerRequestInterface $request, RequestHandlerInterface $handler): ResponseInterface
     {
-        if (!$result = $request->getAttribute(Result::class)){
+        if (!$result = $request->getAttribute(Result::class)) {
             return $handler->handle($request);
         }
         $middleware = $this->resolver->resolve($result->getHandler());

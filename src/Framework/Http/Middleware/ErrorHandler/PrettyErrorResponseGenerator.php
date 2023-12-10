@@ -37,7 +37,7 @@ class PrettyErrorResponseGenerator implements ErrorResponseGenerator
 
     private function getView($code): string
     {
-        if (array_key_exists($code, $this->views)){
+        if (array_key_exists($code, $this->views)) {
             $view = $this->views[$code];
         } else {
             $view = $this->views['error'];

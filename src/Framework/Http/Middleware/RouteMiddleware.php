@@ -25,12 +25,12 @@ class RouteMiddleware implements MiddlewareInterface
         try {
             $result = $this->router->match($request);
 
-            foreach ($request->getAttributes() as $attribute => $value){
+            foreach ($request->getAttributes() as $attribute => $value) {
                 $request = $request->withAttribute($attribute, $value);
             }
 
             return $handler->handle($request->withAttribute(Result::class, $result));
-        } catch (RequestNotMatchedException $exception){
+        } catch (RequestNotMatchedException $exception) {
             return $handler->handle($request);
         }
     }

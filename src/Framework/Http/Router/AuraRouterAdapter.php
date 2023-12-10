@@ -23,7 +23,7 @@ class AuraRouterAdapter implements Router
     {
         $matcher = $this->aura->getMatcher();
 
-        if ($route = $matcher->match($request)){
+        if ($route = $matcher->match($request)) {
             return new Result(
                 $route->name,
                 $route->handler,
@@ -34,12 +34,13 @@ class AuraRouterAdapter implements Router
         throw new RequestNotMatchedException($request);
     }
 
-    public function generate($name, $params = []): string{
+    public function generate($name, $params = []): string
+    {
         $generator = $this->aura->getGenerator();
 
         try {
             return $generator->generate($name, $params);
-        } catch (RouteNotFound $exception){
+        } catch (RouteNotFound $exception) {
             throw new RouteNotFoundException($name, $params, $exception);
         }
     }

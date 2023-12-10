@@ -1,99 +1,29 @@
 <?php
 
-use App\Http\Middleware;
 use Framework\Http\Application;
 use Framework\Http\Middleware\ErrorHandler\ErrorHandlerMiddleware;
 use Framework\Http\Middleware\ErrorHandler\ErrorResponseGenerator;
-use Framework\Http\Middleware\ErrorHandler\PrettyErrorResponseGenerator;
-use Framework\Http\Middleware\ErrorHandler\WhoopsErrorResponseGenerator;
 use Framework\Http\Pipeline\MiddlewareResolver;
-use Framework\Http\Router\AuraRouterAdapter;
 use Framework\Http\Router\Router;
-use Framework\Template\TemplateRenderer;
-use Framework\Template\Twig\Extension\RouteExtension;
-use Framework\Template\Twig\TwigRenderer;
-use Infrastructure\Framework\Http\Middleware\ErrorHandler\LogErrorListener;
-use Psr\Container\ContainerInterface;
+use Infrastructure\App\Logger\LoggerFactory;
+use Infrastructure\Framework\Http\ApplicationFactory;
+use Infrastructure\Framework\Http\Middleware\ErrorHandler\ErrorHandlerMiddlewareFactory;
+use Infrastructure\Framework\Http\Middleware\ErrorHandler\PrettyErrorResponseGeneratorFactory;
+use Infrastructure\Framework\Http\Pipeline\MiddlewareResolverFactory;
+use Infrastructure\Framework\Http\Router\AuraRouterFactory;
 
 return [
     'dependencies' => [
-        'abstract_factories' => [
-            Zend\ServiceManager\AbstractFactory\ReflectionBasedAbstractFactory::class,
-        ],
+//        'abstract_factories' => [
+//            Zend\ServiceManager\AbstractFactory\ReflectionBasedAbstractFactory::class,
+//        ],
         'factories' => [
-            Application::class => function (ContainerInterface $container) {
-                return new Application(
-                    $container->get(MiddlewareResolver::class),
-                    $container->get(Router::class),
-                    $container->get(Middleware\NotFoundHandler::class),
-//                    new Zend\Diactoros\Response()
-                );
-            },
-            Router::class => function () {
-                return new AuraRouterAdapter(new Aura\Router\RouterContainer());
-            },
-            MiddlewareResolver::class => function (ContainerInterface $container) {
-                return new MiddlewareResolver($container, new Zend\Diactoros\Response());
-            },
-//            LogErrorListener::class => function (ContainerInterface $container) {
-//                return new LogErrorListener();
-//            },
-            ErrorHandlerMiddleware::class => function (ContainerInterface $container) {
-                $middleware = new ErrorHandlerMiddleware(
-                    $container->get(ErrorResponseGenerator::class)
-                );
-
-                $middleware->addListener($container->get(LogErrorListener::class));
-
-                return $middleware;
-            },
-            ErrorResponseGenerator::class => function (ContainerInterface $container) {
-                return new PrettyErrorResponseGenerator(
-                    $container->get(TemplateRenderer::class),
-                    new Zend\Diactoros\Response(),
-                    [
-                        '403' => 'error/403',
-                        '404' => 'error/404',
-                        'error' => 'error/error',
-                    ]
-                );
-            },
-            Psr\Log\LoggerInterface::class => function (ContainerInterface $container) {
-                $logger = new Monolog\Logger('App');
-                $logger->pushHandler(new Monolog\Handler\StreamHandler(
-                    'var/log/application.log',
-                    $container->get('config')['debug'] ? Monolog\Logger::DEBUG : Monolog\Logger::WARNING
-                ));
-
-                return $logger;
-            },
-            TemplateRenderer::class => function (ContainerInterface $container) {
-                return new TwigRenderer($container->get(Twig\Environment::class), '.html.twig');
-            },
-            Twig\Environment::class => function(ContainerInterface $container)
-            {
-                $templateDir = 'templates';
-                $cacheDir = 'var/cache/twig';
-                $debug = $container->get('config')['debug'];
-
-                $loader = new Twig\Loader\FilesystemLoader();
-                $loader->addPath($templateDir);
-
-                $environment = new Twig\Environment($loader, [
-                    'cache' => $debug ? false : $cacheDir,
-                    'debug' => $debug,
-                    'strict_variables' => $debug,
-                    'auto_reload' => $debug,
-                ]);
-
-                if ($debug) {
-                    $environment->addExtension(new Twig\Extension\DebugExtension());
-                }
-
-                $environment->addExtension($container->get(RouteExtension::class));
-
-                return $environment;
-            },
+            Application::class => ApplicationFactory::class,
+            Router::class => AuraRouterFactory::class,
+            MiddlewareResolver::class => MiddlewareResolverFactory::class,
+            ErrorHandlerMiddleware::class => ErrorHandlerMiddlewareFactory::class,
+            ErrorResponseGenerator::class => PrettyErrorResponseGeneratorFactory::class,
+            Psr\Log\LoggerInterface::class => LoggerFactory::class,
         ],
     ],
 

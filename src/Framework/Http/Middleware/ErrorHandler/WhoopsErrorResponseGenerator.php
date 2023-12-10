@@ -22,8 +22,8 @@ class WhoopsErrorResponseGenerator implements ErrorResponseGenerator
 
     public function generate(\Throwable $e, ServerRequestInterface $request): ResponseInterface
     {
-        foreach ($this->whoops->getHandlers() as $handler){
-            if ($handler instanceof PrettyPageHandler){
+        foreach ($this->whoops->getHandlers() as $handler) {
+            if ($handler instanceof PrettyPageHandler) {
                 $this->prepareWhoopsHandler($request, $handler);
             }
         }
@@ -38,7 +38,7 @@ class WhoopsErrorResponseGenerator implements ErrorResponseGenerator
 
     private function prepareWhoopsHandler(ServerRequestInterface $request, PrettyPageHandler $handler)
     {
-        $handler->addDataTable('Application Request',[
+        $handler->addDataTable('Application Request', [
             'Http Method' => $request->getMethod(),
             'URI' => (string) $request->getUri(),
             'Script' => $request->getServerParams()['SCRIPT_NAME'],
@@ -50,4 +50,3 @@ class WhoopsErrorResponseGenerator implements ErrorResponseGenerator
         ]);
     }
 }
-

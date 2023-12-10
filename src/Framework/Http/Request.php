@@ -16,7 +16,8 @@ class Request implements ServerRequestInterface
     private $cookieParams;
     private $protocolVersion;
 
-    public function __construct(array $queryParams = [], array $parsedBody = null){
+    public function __construct(array $queryParams = [], array $parsedBody = null)
+    {
         $this->queryParams = $queryParams;
         $this->parsedBody = $parsedBody;
     }

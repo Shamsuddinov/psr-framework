@@ -15,8 +15,8 @@ class ResponseSender
             $response->getReasonPhrase()
         ));
 
-        foreach ($response->getHeaders() as $name => $values){
-            foreach ($values as $value){
+        foreach ($response->getHeaders() as $name => $values) {
+            foreach ($values as $value) {
                 header(sprintf('%s: %s', $name, $value), false);
             }
         }

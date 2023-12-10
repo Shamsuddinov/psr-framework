@@ -33,21 +33,21 @@ class MiddlewareResolver
             return new LazyMiddlewareDecorator($this, $this->container, $handler);
         }
 
-        if ($handler instanceof MiddlewareInterface){
+        if ($handler instanceof MiddlewareInterface) {
             return $handler;
         }
 
-        if ($handler instanceof RequestHandlerInterface){
+        if ($handler instanceof RequestHandlerInterface) {
             return new RequestHandlerMiddleware($handler);
         }
 
-        if (\is_object($handler)){
+        if (\is_object($handler)) {
             $reflection = new \ReflectionObject($handler);
-            if ($reflection->hasMethod('__invoke')){
+            if ($reflection->hasMethod('__invoke')) {
                 $method = $reflection->getMethod('__invoke');
                 $parameters = $method->getParameters();
 
-                if (count($parameters) === 2 && $parameters[1]->getType()){
+                if (count($parameters) === 2 && $parameters[1]->getType()) {
                     return new SinglePassMiddlewareDecorator($handler);
                 }
                 return new DoublePassMiddlewareDecorator($handler, $this->responsePrototype);

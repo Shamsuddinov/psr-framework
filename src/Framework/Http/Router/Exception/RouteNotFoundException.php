@@ -14,7 +14,8 @@ class RouteNotFoundException extends \LogicException
         $this->params = $params;
     }
 
-    public function getName(){
+    public function getName()
+    {
         return $this->name;
     }
 

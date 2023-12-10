@@ -26,10 +26,18 @@
     }
   },
   "scripts": {
+    "check": [
+      "@cs-check",
+      "@test"
+    ],
     "serve": "php -S 0.0.0.0:8080 -t public public/index.php",
     "test": "phpunit --colors=always",
     "development-enable": "cp config/autoload/development.local.php.dist config/autoload/development.local.php",
-    "development-disable": "rm config/autoload/development.local.php"
+    "development-disable": "rm config/autoload/development.local.php",
+    "make-php-cs": "cp phpcs.xml.dist phpcs.xml",
+    "remove-php-cs": "rm cp phpcs.xml",
+    "cs-check": "~/.composer/vendor/bin/phpcs src",
+    "cs-fix": "~/.composer/vendor/bin/phpcbf"
   },
   "require-dev": {
     "filp/whoops": "^2.15",

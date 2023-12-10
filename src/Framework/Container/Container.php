@@ -14,17 +14,17 @@ class Container implements ContainerInterface
      */
     public function get($id)
     {
-        if (array_key_exists($id, $this->results)){
+        if (array_key_exists($id, $this->results)) {
             return $this->results[$id];
         }
 
-        if (!array_key_exists($id, $this->defenitions)){
-            if (class_exists($id)){
+        if (!array_key_exists($id, $this->defenitions)) {
+            if (class_exists($id)) {
                 $reflection = new \ReflectionClass($id);
                 $arguments = [];
 
-                if (($constructor = $reflection->getConstructor()) != null){
-                    foreach ($constructor->getParameters() as $parameter){
+                if (($constructor = $reflection->getConstructor()) != null) {
+                    foreach ($constructor->getParameters() as $parameter) {
                         $paramClass = $parameter->getClass();
                         $arguments[] = $this->get($paramClass->getName());
                     }
@@ -38,7 +38,7 @@ class Container implements ContainerInterface
 
         $defenition = $this->defenitions[$id];
 
-        if ($defenition instanceof \Closure){
+        if ($defenition instanceof \Closure) {
             $this->results[$id] = $defenition($this);
         } else {
             $this->results[$id] = $defenition;
@@ -54,7 +54,7 @@ class Container implements ContainerInterface
 
     public function set($id, $value)
     {
-        if (array_key_exists($id, $this->results)){
+        if (array_key_exists($id, $this->results)) {
             unset($this->results[$id]);
         }
 
