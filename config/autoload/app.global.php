@@ -5,12 +5,14 @@ use Framework\Http\Application;
 use Framework\Http\Middleware\ErrorHandler\ErrorHandlerMiddleware;
 use Framework\Http\Middleware\ErrorHandler\ErrorResponseGenerator;
 use Framework\Http\Middleware\ErrorHandler\PrettyErrorResponseGenerator;
+use Framework\Http\Middleware\ErrorHandler\WhoopsErrorResponseGenerator;
 use Framework\Http\Pipeline\MiddlewareResolver;
 use Framework\Http\Router\AuraRouterAdapter;
 use Framework\Http\Router\Router;
 use Framework\Template\TemplateRenderer;
 use Framework\Template\Twig\Extension\RouteExtension;
 use Framework\Template\Twig\TwigRenderer;
+use Infrastructure\Framework\Http\Middleware\ErrorHandler\LogErrorListener;
 use Psr\Container\ContainerInterface;
 
 return [
@@ -24,7 +26,7 @@ return [
                     $container->get(MiddlewareResolver::class),
                     $container->get(Router::class),
                     $container->get(Middleware\NotFoundHandler::class),
-                    new Zend\Diactoros\Response()
+//                    new Zend\Diactoros\Response()
                 );
             },
             Router::class => function () {
@@ -33,18 +35,19 @@ return [
             MiddlewareResolver::class => function (ContainerInterface $container) {
                 return new MiddlewareResolver($container, new Zend\Diactoros\Response());
             },
+//            LogErrorListener::class => function (ContainerInterface $container) {
+//                return new LogErrorListener();
+//            },
             ErrorHandlerMiddleware::class => function (ContainerInterface $container) {
-                return new ErrorHandlerMiddleware(
+                $middleware = new ErrorHandlerMiddleware(
                     $container->get(ErrorResponseGenerator::class)
                 );
+
+                $middleware->addListener($container->get(LogErrorListener::class));
+
+                return $middleware;
             },
             ErrorResponseGenerator::class => function (ContainerInterface $container) {
-                if ($container->get('config')['debug']){
-                    return new \Framework\Http\Middleware\ErrorHandler\WhoopsErrorResponseGenerator(
-                        $container->get(TemplateRenderer::class),
-                        new Zend\Diactoros\Response(),
-                     );
-                }
                 return new PrettyErrorResponseGenerator(
                     $container->get(TemplateRenderer::class),
                     new Zend\Diactoros\Response(),
@@ -63,14 +66,6 @@ return [
                 ));
 
                 return $logger;
-            },
-            Whoops\RunInterface::class => function () {
-                $whoops = new Whoops\Run();
-                $whoops->writeToOutput(false);
-                $whoops->allowQuit(false);
-                $whoops->pushHandler(new Whoops\Handler\PrettyPageHandler());
-                $whoops->register();
-                return $whoops;
             },
             TemplateRenderer::class => function (ContainerInterface $container) {
                 return new TwigRenderer($container->get(Twig\Environment::class), '.html.twig');

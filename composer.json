@@ -21,12 +21,15 @@
     "psr-4": {
       "Framework\\": "src/Framework/",
       "App\\": "src/App/",
+      "Infrastructure\\": "src/Infrastructure/",
       "Tests\\": "tests/"
     }
   },
   "scripts": {
     "serve": "php -S 0.0.0.0:8080 -t public public/index.php",
-    "test": "phpunit --colors=always"
+    "test": "phpunit --colors=always",
+    "development-enable": "cp config/autoload/development.local.php.dist config/autoload/development.local.php",
+    "development-disable": "rm config/autoload/development.local.php"
   },
   "require-dev": {
     "filp/whoops": "^2.15",
