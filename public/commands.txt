@@ -46,3 +46,12 @@ analyser - ~/.composer/vendor/bin/phpcs src
 prettier - ~/.composer/vendor/bin/phpcbf
 
 ****************************
+
+*******
+KONSOL
+*******
+$_SERVER['argv'], $argv - parametrlar
+$_SERVER['argc'], $argc - parametrlar soni
+
+Agar, $argv yoki $argc ni tanimasa. global($argv); yoki global($args); ni yozib qo'yishimiz kerak.
+ -  -
