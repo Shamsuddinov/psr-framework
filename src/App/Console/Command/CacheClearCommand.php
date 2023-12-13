@@ -2,6 +2,8 @@
 
 namespace App\Console\Command;
 
+use http\Exception\RuntimeException;
+
 class CacheClearCommand
 {
     private $paths = [
@@ -13,16 +15,35 @@ class CacheClearCommand
     {
         echo 'Clearing cache.' . PHP_EOL;
 
-        fwrite(\STDOUT, 'Input path :');
-        $alias = trim(fgets(\STDIN));
+        $alias = $args[0] ?? '';
 
-        $path = $this->paths[$alias];
+        if (empty($alias)){
+            $options = array_merge(['all'], array_keys($this->paths));
 
-        if (file_exists($path)){
-            echo 'Remove ' . $path . PHP_EOL;
-            $this->delete($path);
+            do{
+                fwrite(\STDOUT, 'Choose path [' . implode(',', $options) . ']:');
+                $choose = trim(fgets(\STDIN));
+            } while(!in_array($choose, $options, true));
+
+            $alias = $choose;
+        }
+
+        if ($alias === 'all'){
+            $paths = $this->paths;
         } else {
-            echo 'Skip ' . $path . PHP_EOL;
+            if (!array_key_exists($alias, $this->paths)){
+                throw new \InvalidArgumentException('Unknown path alias : ' . $alias);
+            }
+            $paths = [$alias => $this->paths[$alias]];
+        }
+
+        foreach ($paths as $path){
+            if (file_exists($path)){
+                echo 'Remove ' . $path . PHP_EOL;
+                $this->delete($path);
+            } else {
+                echo 'Skip ' . $path . PHP_EOL;
+            }
         }
 
         echo 'Done ' . $path . PHP_EOL;
@@ -30,20 +51,25 @@ class CacheClearCommand
 
     private function delete(string $path)
     {
-        echo 'Clearing cache.' . PHP_EOL;
-
-        fwrite(\STDOUT, 'Input path :');
-        $alias = trim(fgets(\STDIN));
-
-        $path = $this->paths[$alias];
-
-        if (file_exists($path)){
-            echo 'Remove ' . $path . PHP_EOL;
-            $this->delete($path);
-        } else {
-            echo 'Skip ' . $path . PHP_EOL;
+        if (!file_exists($path)){
+            throw new RuntimeException('Undefined path . ' . $path);
         }
 
-        echo 'Done ' . $path . PHP_EOL;
+        if (is_dir($path)){
+            foreach (scandir($path, SCANDIR_SORT_ASCENDING) as $item){
+                if ($item === '.' || $item === '..'){
+                    continue;
+                }
+
+                $this->delete($path . DIRECTORY_SEPARATOR . $item);
+            }
+            if (!rmdir($path)){
+                throw new RuntimeException('Unable to delete directory . ' . $path);
+            }
+        } else {
+            if (!unlink($path)){
+                throw new RuntimeException('Unable to delete file . ' . $path);
+            }
+        }
     }
 }
