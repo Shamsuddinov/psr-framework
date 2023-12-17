@@ -2,6 +2,8 @@
 
 namespace App\Console\Command;
 
+use Framework\Console\Input;
+use Framework\Console\Output;
 use http\Exception\RuntimeException;
 
 class CacheClearCommand
@@ -11,21 +13,14 @@ class CacheClearCommand
         'db' => 'var/cache/db',
     ];
 
-    public function execute(array $args)
+    public function execute(Input $input, Output $output)
     {
-        echo 'Clearing cache.' . PHP_EOL;
+        $output->comment('Clearing cache.');
 
-        $alias = $args[0] ?? '';
+        $alias = $input->getArgument(0) ?? '';
 
         if (empty($alias)){
-            $options = array_merge(['all'], array_keys($this->paths));
-
-            do{
-                fwrite(\STDOUT, 'Choose path [' . implode(',', $options) . ']:');
-                $choose = trim(fgets(\STDIN));
-            } while(!in_array($choose, $options, true));
-
-            $alias = $choose;
+            $alias = $input->choose('Choose path', array_merge(['all'], array_keys($this->paths)));
         }
 
         if ($alias === 'all'){
@@ -39,14 +34,14 @@ class CacheClearCommand
 
         foreach ($paths as $path){
             if (file_exists($path)){
-                echo 'Remove ' . $path . PHP_EOL;
+                $output->writeln('Remove ' . $path);
                 $this->delete($path);
             } else {
-                echo 'Skip ' . $path . PHP_EOL;
+                $output->writeln('Skip ' . $path);
             }
         }
 
-        echo 'Done ' . $path . PHP_EOL;
+        $output->info('Done ');
     }
 
     private function delete(string $path)
