@@ -15,11 +15,7 @@ require 'vendor/autoload.php';
 $container = require 'config/container.php';
 
 $commands = [
-    [
-        'name' => 'cache:clear',
-        'command' => CacheClearCommand::class,
-        'description' => 'Clear cache',
-    ]
+    $container->get(CacheClearCommand::class)
 ];
 
 $input = new Input($argv);
@@ -41,7 +37,7 @@ if (!empty($name)){
 $output->writeln('<comment>Available command:</comment>');
 $output->writeln('');
 
-foreach ($commands as $definition){
-    $output->writeln('<info>' . $definition['name'] .'</info>' . '\t' . $definition['description']);
+foreach ($commands as $command){
+    $output->writeln('<info>' . $command->getName() .'</info>' . '\t' . $command->getDescription());
 }
 $output->writeln('');
