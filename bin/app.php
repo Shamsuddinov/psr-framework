@@ -1,11 +1,8 @@
 #!/usr/bin/env php
 <?php
 
-use App\Console\Command\CacheClearCommand;
-use Framework\Console\Application;
-use Framework\Console\Input;
-use Framework\Console\Output;
 use Psr\Container\ContainerInterface;
+use Symfony\Component\Console\Application;
 
 chdir(dirname(__DIR__));
 require 'vendor/autoload.php';
@@ -22,4 +19,4 @@ foreach ($commands as $command){
     $cli->add($container->get($command));
 }
 
-$cli->run(new Input($argv), new Output());
+$cli->run();
