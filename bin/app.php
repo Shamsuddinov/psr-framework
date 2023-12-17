@@ -3,6 +3,7 @@
 
 use App\Console\Command\CacheClearCommand;
 use Framework\Console\Input;
+use Framework\Console\Output;
 use Psr\Container\ContainerInterface;
 
 chdir(dirname(__DIR__));
@@ -13,13 +14,34 @@ require 'vendor/autoload.php';
  */
 $container = require 'config/container.php';
 
-$command = $container->get(CacheClearCommand::class);
-$args = array_slice($argv, 1);
+$commands = [
+    [
+        'name' => 'cache:clear',
+        'command' => CacheClearCommand::class,
+        'description' => 'Clear cache',
+    ]
+];
 
-$input = new Input($args);
+$input = new Input($argv);
+$output = new Output();
+$name = $input->getArgument(0);
 
-$command->execute($input);
-echo "<pre>";
-print_r('ok');
-echo "</pre>";
-die();
+if (!empty($name)){
+    foreach ($commands as $definition){
+        if ($definition['name'] == $name){
+            $command = $container->get($definition['command']);
+            $command->execute($input, $output);
+            exit();
+        }
+    }
+
+    throw new InvalidArgumentException('Undefined command ' . $name);
+}
+
+$output->writeln('<comment>Available command:</comment>');
+$output->writeln('');
+
+foreach ($commands as $definition){
+    $output->writeln('<info>' . $definition['name'] .'</info>' . '\t' . $definition['description']);
+}
+$output->writeln('');

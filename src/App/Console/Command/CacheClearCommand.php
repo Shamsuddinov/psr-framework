@@ -2,22 +2,27 @@
 
 namespace App\Console\Command;
 
+use App\Service\FileManager;
 use Framework\Console\Input;
 use Framework\Console\Output;
-use http\Exception\RuntimeException;
+use Framework\Console\Command;
 
-class CacheClearCommand
+class CacheClearCommand implements Command
 {
-    private $paths = [
-        'twig' => 'var/cache/twig',
-        'db' => 'var/cache/db',
-    ];
+    private $paths;
+    private $files;
+
+    public function __construct(array $paths, FileManager $files)
+    {
+        $this->paths = $paths;
+        $this->files = $files;
+    }
 
     public function execute(Input $input, Output $output)
     {
-        $output->writeln('Clearing <comment>cache</comment>.');
+        $output->writeln('<comment>Clearing cache</comment>.');
 
-        $alias = $input->getArgument(0) ?? '';
+        $alias = $input->getArgument(1);
 
         if (empty($alias)){
             $alias = $input->choose('Choose path', array_merge(['all'], array_keys($this->paths)));
@@ -33,38 +38,14 @@ class CacheClearCommand
         }
 
         foreach ($paths as $path){
-            if (file_exists($path)){
+            if ($this->files->exists($path)){
                 $output->writeln('Remove ' . $path);
-                $this->delete($path);
+                $this->files->delete($path);
             } else {
                 $output->writeln('Skip ' . $path);
             }
         }
 
         $output->writeln('<info>Done</info>');
-    }
-
-    private function delete(string $path)
-    {
-        if (!file_exists($path)){
-            throw new RuntimeException('Undefined path . ' . $path);
-        }
-
-        if (is_dir($path)){
-            foreach (scandir($path, SCANDIR_SORT_ASCENDING) as $item){
-                if ($item === '.' || $item === '..'){
-                    continue;
-                }
-
-                $this->delete($path . DIRECTORY_SEPARATOR . $item);
-            }
-            if (!rmdir($path)){
-                throw new RuntimeException('Unable to delete directory . ' . $path);
-            }
-        } else {
-            if (!unlink($path)){
-                throw new RuntimeException('Unable to delete file . ' . $path);
-            }
-        }
     }
 }
