@@ -4,6 +4,7 @@
   },
   "require": {
     "php": ">=7.4.0",
+    "ext-http": "*",
     "ext-pdo": "*",
     "aura/router": "^3.1",
     "monolog/monolog": "^2.9",
@@ -11,12 +12,12 @@
     "psr/http-message": "^1.0.0",
     "psr/http-server-middleware": "^1.0",
     "psr/log": "^1.0",
+    "symfony/console": "^5.4",
     "twig/twig": "^2.4",
     "zendframework/zend-config-aggregator": "^1.0",
     "zendframework/zend-diactoros": "^1.7",
     "zendframework/zend-servicemanager": "^3.3",
-    "zendframework/zend-stratigility": "^3.0",
-    "ext-http": "*"
+    "zendframework/zend-stratigility": "^3.0"
   },
   "autoload": {
     "psr-4": {
