@@ -2,6 +2,7 @@
 <?php
 
 use App\Console\Command\CacheClearCommand;
+use Framework\Console\Application;
 use Framework\Console\Input;
 use Framework\Console\Output;
 use Psr\Container\ContainerInterface;
@@ -14,30 +15,11 @@ require 'vendor/autoload.php';
  */
 $container = require 'config/container.php';
 
-$commands = [
-    $container->get(CacheClearCommand::class)
-];
-
-$input = new Input($argv);
-$output = new Output();
-$name = $input->getArgument(0);
-
-if (!empty($name)){
-    foreach ($commands as $definition){
-        if ($definition['name'] == $name){
-            $command = $container->get($definition['command']);
-            $command->execute($input, $output);
-            exit();
-        }
-    }
-
-    throw new InvalidArgumentException('Undefined command ' . $name);
-}
-
-$output->writeln('<comment>Available command:</comment>');
-$output->writeln('');
+$cli = new Application();
+$commands = $container->get('config')['console']['commands'];
 
 foreach ($commands as $command){
-    $output->writeln('<info>' . $command->getName() .'</info>' . '\t' . $command->getDescription());
+    $cli->add($container->get($command));
 }
-$output->writeln('');
+
+$cli->run(new Input($argv), new Output());

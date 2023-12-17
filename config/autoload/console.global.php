@@ -6,14 +6,13 @@ use Psr\Container\ContainerInterface;
 return [
     'dependencies' => [
         'factories' => [
-            CacheClearCommand::class => function (ContainerInterface $container) {
-                return new CacheClearCommand(
-                    $container->get('config')['console']['cachePaths']
-                );
-            },
+            CacheClearCommand::class => CacheClearCommand::class,
         ],
     ],
     'console' => [
+        'commands' => [
+            CacheClearCommand::class
+        ],
         'cachePaths' => [
             'twig' => 'var/cache/twig',
             'db' => 'var/cache/db',
