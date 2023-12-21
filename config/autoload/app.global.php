@@ -24,6 +24,16 @@ return [
             ErrorHandlerMiddleware::class => ErrorHandlerMiddlewareFactory::class,
             ErrorResponseGenerator::class => PrettyErrorResponseGeneratorFactory::class,
             Psr\Log\LoggerInterface::class => LoggerFactory::class,
+            PDO::class => function () {
+                return new PDO(
+                    'sqlite:db/db.sqlite',
+                    'user',
+                    'password',
+                    [
+                        PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
+                    ]
+                );
+            }
         ],
     ],
 
