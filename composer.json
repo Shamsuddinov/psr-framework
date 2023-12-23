@@ -44,6 +44,7 @@
   },
   "require-dev": {
     "filp/whoops": "^2.15",
+    "fzaninotto/faker": "^1.9",
     "phpunit/phpunit": "^6.4"
   }
 }

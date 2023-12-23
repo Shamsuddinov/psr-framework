@@ -55,3 +55,50 @@ $_SERVER['argc'], $argc - parametrlar soni
 
 Agar, $argv yoki $argc ni tanimasa. global($argv); yoki global($args); ni yozib qo'yishimiz kerak.
  -  -
+
+*******
+PHINX
+*******
+
+composer require robmorgan/phinx --ignore-platform-req=ext-http - phinx kutubxonasi, migratsiyalar bilan ishlash uchun
+
+1) project_name/phinx.php - fayli yaratilib, bu narsa yoziladi:
+
+<?php
+
+require 'vendor/autoload.php';
+
+$container = require 'config/container.php';
+
+return [
+    'environments' => [
+        'default_migration_table' => 'migrations',
+        'default_database' => 'app',
+        'app' => [
+            'name' => $container->get('config')['phinx']['database'],
+            'connection' => $container->get(PDO::class),
+        ]
+    ],
+    'paths' => [
+        'migrations' => 'db/migrations',
+        'seeds' => 'db/seeds'
+    ]
+];
+
+2) init nomli migratsiya faylini yaratish:
+
+vendor/bin/phinx create Init
+
+3) Migratsiyani yurgizish:
+
+vendor/bin/phinx migrate
+
+4) Seeder qo'shish va yurgizish:
+
+vendor/bin/phinx seed:create PostSeeder
+
+vendor/bin/phinx seed:run
+
+5) Fake ma'lumotlar bilan to'ldirish uchun kutubxona:
+
+composer require --dev fzaninotto/faker
