@@ -17,6 +17,8 @@ composer install - composer.json ichidagi require va require-dev bo'lgan paketla
 
 composer install --no-dev - composer.json ichidagi require-dev bo'lgan paketlarni o'rnatmaydi. Productionda ular kerakmas chunki.
 
+composer why symfony/console - paketlarni bog'liqligini nima uchun o'chirmayotgani/yangilamayotganini ko'rsatadi
+
 lsof -i :8080 - :8080 portidan kimlar foydalanayotganligini ko'rsatib beradi. U yerdan process id olinadi.
 
 kill -9 <PID> - <PID>ni to'xtatish.
@@ -142,8 +144,9 @@ vendor/bin/doctrine orm:schema-tool:create
 Shu ko'rinishda ham ishlatsa bo'ladi. Yoki app.php ga o'zgartirish kiritib:
 
 ....
+$entityManager = $container->get(EntityManagerInterface::class);
 cli->getHelperSet()->set(new EntityManagerHelper($entityManager), 'em');
-$cli->getHelperSet()->set(new ConfigurationHelper($connection, $configuration), 'configuration');
+
 
 Doctrine\ORM\Tools\Console\ConsoleRunner::addCommands($cli);
 ....
