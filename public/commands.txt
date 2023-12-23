@@ -102,3 +102,48 @@ vendor/bin/phinx seed:run
 5) Fake ma'lumotlar bilan to'ldirish uchun kutubxona:
 
 composer require --dev fzaninotto/faker
+
+**************
+Doctrine
+**************
+
+O'rnatish:
+
+composer require dasprid/container-interop-doctrine
+
+1) project_path/cli-config.php
+
+<?php
+
+use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\ORM\Tools\Console\Helper\EntityManagerHelper;
+use Symfony\Component\Console\Helper\DebugFormatterHelper;
+use Symfony\Component\Console\Helper\FormatterHelper;
+use Symfony\Component\Console\Helper\HelperSet;
+use Symfony\Component\Console\Helper\ProcessHelper;
+use Symfony\Component\Console\Helper\QuestionHelper;
+
+require 'vendor/autoload.php';
+
+$container = require 'config/container.php';
+
+return new HelperSet([
+    new FormatterHelper(),
+    new DebugFormatterHelper(),
+    new ProcessHelper(),
+    new QuestionHelper(),
+    'em' => new EntityManagerHelper($container->get(EntityManagerInterface::class)),
+]);
+
+2) Entitylar yaratilganidan keyin, ular asosida MB va jadval yaratish uchun:
+
+vendor/bin/doctrine orm:schema-tool:create
+
+Shu ko'rinishda ham ishlatsa bo'ladi. Yoki app.php ga o'zgartirish kiritib:
+
+....
+cli->getHelperSet()->set(new EntityManagerHelper($entityManager), 'em');
+$cli->getHelperSet()->set(new ConfigurationHelper($connection, $configuration), 'configuration');
+
+Doctrine\ORM\Tools\Console\ConsoleRunner::addCommands($cli);
+....

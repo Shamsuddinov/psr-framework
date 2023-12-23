@@ -25,7 +25,7 @@ class IndexAction
         $offset = ($page - 1) * $perPage;
         $limit = $perPage;
         $total = $this->posts->countAll();
-        $count = ceil($total/$perPage);
+        $count = ceil((!empty($total) ? $total : 0)/$perPage);
 
         $posts = $this->posts->getAll($offset, $limit);
 
