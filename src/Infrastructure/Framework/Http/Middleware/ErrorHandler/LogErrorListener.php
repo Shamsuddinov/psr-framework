@@ -3,7 +3,6 @@
 namespace Infrastructure\Framework\Http\Middleware\ErrorHandler;
 
 use Psr\Http\Message\ServerRequestInterface;
-use Psr\Http\Server\RequestHandlerInterface;
 use Psr\Log\LoggerInterface;
 
 class LogErrorListener
@@ -15,11 +14,11 @@ class LogErrorListener
         $this->logger = $logger;
     }
 
-    public function __invoke(\Throwable $throwable, ServerRequestInterface $request)
+    public function __invoke(\Throwable $e, ServerRequestInterface $request)
     {
-        $this->logger->error($throwable->getMessage(), [
-            'exception' => $throwable,
-            'request' => self::extractRequest($request)
+        $this->logger->error($e->getMessage(), [
+            'exception' => $e,
+            'request' => self::extractRequest($request),
         ]);
     }
 
@@ -27,7 +26,7 @@ class LogErrorListener
     {
         return [
             'method' => $request->getMethod(),
-            'url' => $request->getUri(),
+            'url' => (string)$request->getUri(),
             'server' => $request->getServerParams(),
             'cookies' => $request->getCookieParams(),
             'body' => $request->getParsedBody(),

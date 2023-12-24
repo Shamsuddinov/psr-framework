@@ -2,59 +2,88 @@
 
 namespace App\ReadModel;
 
-use App\ReadModel\Views\PostView;
-use Monolog\DateTimeImmutable;
-use PDO;
-
 class PostReadRepository
 {
     private $pdo;
 
-    public function __construct(PDO $pdo)
+    public function __construct(\PDO $pdo)
     {
         $this->pdo = $pdo;
     }
 
-    public function countAll(): array
+    public function countAll(): int
     {
-        $stmt = $this->pdo->query('SELECT COUNT(id) FROM posts');
-
-        return $stmt->fetchColumn();
+        return $this->pdo->query('SELECT COUNT(id) FROM posts')->fetchColumn();
     }
 
-    /**
-     * @return PostView[]
-     */
-    public function getAll(int $offset, int $limit): array
+    public function all(int $offset, int $limit): array
     {
-        $stmt = $this->pdo->query('SELECT * FROM posts ORDER BY id DESC LIMIT :limit OFFSET :offset');
-        $stmt->bindValue(':offset', $offset, PDO::PARAM_INT);
-        $stmt->bindValue(':limit', $limit, PDO::PARAM_INT);
+        $stmt = $this->pdo->prepare('
+            SELECT
+                p.*,
+                (SELECT COUNT(*) FROM comments c WHERE c.post_id = p.id) comments_count
+            FROM posts p ORDER BY p.create_date DESC LIMIT :limit OFFSET :offset
+        ');
+
+        $stmt->bindValue(':limit', $limit, \PDO::PARAM_INT);
+        $stmt->bindValue(':offset', $offset, \PDO::PARAM_INT);
+
         $stmt->execute();
-        $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-        return array_map([$this, 'hydratePost'], $rows);
+        return array_map([$this, 'hydratePostList'], $stmt->fetchAll());
     }
 
-    public function find($id): ?PostView
+    public function find(int $id): ?array
     {
-        $stmt = $this->pdo->prepare('SELECT * FROM posts WHERE id = :id');
-        $stmt->bindValue(':id', $id, PDO::FETCH_ASSOC);
+        $stmt = $this->pdo->prepare('SELECT p.* FROM posts p WHERE id = :id');
+        $stmt->bindValue(':id', $id, \PDO::PARAM_INT);
         $stmt->execute();
-        $row = $stmt->fetch(PDO::FETCH_ASSOC);
 
-        return $row ? $this->hydratePost($row) : null;
+        if (!$post = $stmt->fetch(\PDO::FETCH_ASSOC)) {
+            return null;
+        }
+
+        $stmt = $this->pdo->prepare('SELECT * FROM comments WHERE post_id = :post_id ORDER BY id ASC');
+        $stmt->bindValue(':post_id', (int)$post['id'], \PDO::PARAM_INT);
+        $stmt->execute();
+        $comments = $stmt->fetchAll(\PDO::FETCH_ASSOC);
+
+        return $this->hydratePostDetail($post, $comments);
     }
 
-    private function hydratePost($row): ?PostView
+    private function hydratePostList(array $row): array
     {
-        $view = new PostView(
-            $row['id'],
-            new DateTimeImmutable($row['date']),
-            $row['title'],
-            $row['content']
-        );
+        return [
+            'id' => (int)$row['id'],
+            'date' => new \DateTimeImmutable($row['create_date']),
+            'title' => $row['title'],
+            'preview' => $row['content_short'],
+            'commentsCount' => $row['comments_count'],
+        ];
+    }
 
-        return $view;
+    private function hydratePostDetail(array $row, array $comments): array
+    {
+        return [
+            'id' => (int)$row['id'],
+            'date' => new \DateTimeImmutable($row['create_date']),
+            'title' => $row['title'],
+            'content' => $row['content_full'],
+            'meta' => [
+                'title' => $row['meta_title'],
+                'description' => $row['meta_description'],
+            ],
+            'comments' => array_map([$this, 'hydrateComment'], $comments),
+        ];
+    }
+
+    private function hydrateComment(array $row): array
+    {
+        return [
+            'id' => (int)$row['id'],
+            'date' => new \DateTimeImmutable($row['date']),
+            'author' => $row['author'],
+            'text' => $row['text'],
+        ];
     }
 }

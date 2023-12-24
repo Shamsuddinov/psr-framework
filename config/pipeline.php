@@ -1,27 +1,17 @@
 <?php
 
 use App\Http\Middleware;
-use Framework\Http\Application;
 
-/**
- * @var Application $app
- */
+/** @var \Framework\Http\Application $app */
 
-$app->pipe(\Framework\Http\Middleware\ErrorHandler\ErrorHandlerMiddleware::class);
+$app->pipe(Framework\Http\Middleware\ErrorHandler\ErrorHandlerMiddleware::class);
+$app->pipe(Middleware\ResponseLoggerMiddleware::class);
 $app->pipe(Middleware\CredentialsMiddleware::class);
 $app->pipe(Middleware\ProfilerMiddleware::class);
-$app->pipe(\Framework\Http\Middleware\RouteMiddleware::class);
-$app->pipe('cabinet', Middleware\BasicAuthMiddleware::class);
-$app->pipe(\Framework\Http\Middleware\DispatchMiddleware::class);
+$app->pipe(Framework\Http\Middleware\BodyParamsMiddleware::class);
+$app->pipe(Framework\Http\Middleware\RouteMiddleware::class);
+$app->pipe(Middleware\EmptyResponseMiddleware::class);
 
-///**
-// * @var Application $app
-// * @var Container $container
-// */
-//
-//$app->pipe($container->get(Middleware\ErrorHandlerMiddleware::class));
-////$app->pipe(Middleware\CredentialsMiddleware::class);
-////$app->pipe(Middleware\ProfilerMiddleware::class);
-//$app->pipe($container->get(\Framework\Http\Middleware\RouteMiddleware::class));
-//$app->pipe('cabinet', $container->get(Middleware\BasicAuthMiddleware::class));
-//$app->pipe($container->get(\Framework\Http\Middleware\DispatchMiddleware::class));
+$app->pipe('cabinet', Middleware\BasicAuthMiddleware::class);
+
+$app->pipe(Framework\Http\Middleware\DispatchMiddleware::class);

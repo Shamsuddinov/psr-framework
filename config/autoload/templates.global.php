@@ -1,22 +1,30 @@
 <?php
 
 use Framework\Template\TemplateRenderer;
-use Infrastructure\Framework\Template\TemplateRendererFactory;
-use Infrastructure\Framework\Template\TwigEnvironmentFactory;
 
 return [
     'dependencies' => [
         'factories' => [
-            TemplateRenderer::class => TemplateRendererFactory::class,
-            Twig\Environment::class => TwigEnvironmentFactory::class,
+            TemplateRenderer::class => Infrastructure\Framework\Template\TemplateRendererFactory::class,
+            Twig\Environment::class => Infrastructure\Framework\Template\Twig\TwigEnvironmentFactory::class,
+            Stormiix\Twig\Extension\MixExtension::class => Infrastructure\App\Twig\MixExtensionFactory::class,
         ],
     ],
+
     'templates' => [
-        'extension' => '.html.twig'
+        'extension' => '.html.twig',
     ],
+
     'twig' => [
         'template_dir' => 'templates',
         'cache_dir' => 'var/cache/twig',
-        'extensions' => [],
-    ]
+        'extensions' => [
+            Stormiix\Twig\Extension\MixExtension::class,
+        ],
+    ],
+
+    'mix' => [
+        'root' => 'public/build',
+        'manifest' => 'mix-manifest.json',
+    ],
 ];

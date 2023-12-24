@@ -18,19 +18,13 @@ class Application implements MiddlewareInterface, RequestHandlerInterface
     private $router;
     private $default;
     private $pipeline;
-    private $responsePrototype;
 
-    public function __construct(
-        MiddlewareResolver $resolver,
-        Router $router,
-        RequestHandlerInterface $default,
-        ResponseInterface $responsePrototype
-    ) {
+    public function __construct(MiddlewareResolver $resolver, Router $router, RequestHandlerInterface $default)
+    {
         $this->resolver = $resolver;
         $this->router = $router;
         $this->pipeline = new MiddlewarePipe();
         $this->default = $default;
-        $this->responsePrototype = $responsePrototype;
     }
 
     public function pipe($path, $middleware = null): void
@@ -87,58 +81,3 @@ class Application implements MiddlewareInterface, RequestHandlerInterface
         return $this->pipeline->process($request, $handler);
     }
 }
-
-
-
-
-//class Application extends Pipeline
-//{
-//    private $resolver;
-//    private $default;
-//
-//    public function __construct(MiddlewareResolver $resolver, callable $next)
-//    {
-//        parent::__construct();
-//        $this->resolver = $resolver;
-//        $this->default = $next;
-//    }
-//
-//    public function pipe(callable $middleware)
-//    {
-//        parent::pipe($this->resolver->resolve($middleware));
-//    }
-//
-//    public function run(ServerRequestInterface $request, ResponseInterface $response)
-//    {
-//        return $this($request, $response, $this->default);
-//    }
-//}
-
-
-
-
-
-
-// 3-dars eskisi
-//class Application extends Pipeline
-//{
-//    private $resolver;
-//    private $default;
-//
-//    public function __construct(MiddlewareResolver $resolver, callable $next)
-//    {
-//        parent::__construct();
-//        $this->resolver = $resolver;
-//        $this->default = $next;
-//    }
-//
-//    public function pipe(callable $middleware)
-//    {
-//        parent::pipe($this->resolver->resolve($middleware));
-//    }
-//
-//    public function run(ServerRequestInterface $request)
-//    {
-//        return $this($request, $this->default);
-//    }
-//}

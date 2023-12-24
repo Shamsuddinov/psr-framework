@@ -1,27 +1,38 @@
 <?php
 
+use App\Console\Command;
 use Framework\Http\Middleware\ErrorHandler\ErrorResponseGenerator;
-use Framework\Http\Middleware\ErrorHandler\WhoopsErrorResponseGenerator;
-use Framework\Template\TemplateRenderer;
-use Psr\Container\ContainerInterface;
+use Infrastructure\Framework\Http\Middleware\ErrorHandler\WhoopsErrorResponseGeneratorFactory;
+use Infrastructure\Framework\Http\Middleware\ErrorHandler\WhoopsRunFactory;
 
 return [
     'dependencies' => [
         'factories' => [
-            ErrorResponseGenerator::class => function (ContainerInterface $container) {
-                return new WhoopsErrorResponseGenerator(
-                    $container->get(TemplateRenderer::class),
-                    new Zend\Diactoros\Response(),
-                );
-            },
-            Whoops\RunInterface::class => function () {
-                $whoops = new Whoops\Run();
-                $whoops->writeToOutput(false);
-                $whoops->allowQuit(false);
-                $whoops->pushHandler(new Whoops\Handler\PrettyPageHandler());
-                $whoops->register();
-                return $whoops;
-            },
+            ErrorResponseGenerator::class => WhoopsErrorResponseGeneratorFactory::class,
+            Whoops\RunInterface::class => WhoopsRunFactory::class,
+            Command\FixtureCommand::class => Infrastructure\App\Console\Command\FixtureCommandFactory::class,
+        ],
+    ],
+
+    'console' => [
+        'commands' => [
+            Command\FixtureCommand::class,
+        ],
+    ],
+
+    'doctrine' => [
+        'configuration' => [
+            'orm_default' => [
+                'result_cache' => 'array',
+                'metadata_cache' => 'array',
+                'query_cache' => 'array',
+                'hydration_cache' => 'array',
+            ],
+        ],
+        'driver' => [
+            'entities' => [
+                'cache' => 'array',
+            ],
         ],
     ],
 

@@ -2,7 +2,6 @@
 
 namespace Infrastructure\Framework\Http\Middleware\ErrorHandler;
 
-use Framework\Http\Middleware\ErrorHandler\PrettyErrorResponseGenerator;
 use Framework\Template\TemplateRenderer;
 use Psr\Container\ContainerInterface;
 use Zend\Diactoros\Response;

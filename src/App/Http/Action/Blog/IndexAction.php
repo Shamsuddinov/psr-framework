@@ -1,13 +1,19 @@
 <?php
+
 namespace App\Http\Action\Blog;
 
-use Psr\Http\Message\ServerRequestInterface;
+use App\ReadModel\Pagination;
 use App\ReadModel\PostReadRepository;
 use Framework\Template\TemplateRenderer;
+use Psr\Http\Message\ResponseInterface;
+use Psr\Http\Message\ServerRequestInterface;
+use Psr\Http\Server\RequestHandlerInterface;
 use Zend\Diactoros\Response\HtmlResponse;
 
-class IndexAction
+class IndexAction implements RequestHandlerInterface
 {
+    private const PER_PAGE = 5;
+
     private $posts;
     private $template;
 
@@ -17,22 +23,22 @@ class IndexAction
         $this->template = $template;
     }
 
-    public function __invoke(ServerRequestInterface $request): HtmlResponse
+    public function handle(ServerRequestInterface $request): ResponseInterface
     {
-        $page = $request->getAttribute('page') ?: 1;
+        $pager = new Pagination(
+            $this->posts->countAll(),
+            $request->getAttribute('page') ?: 1,
+            self::PER_PAGE
+        );
 
-        $perPage = 3;
-        $offset = ($page - 1) * $perPage;
-        $limit = $perPage;
-        $total = $this->posts->countAll();
-        $count = ceil((!empty($total) ? $total : 0)/$perPage);
-
-        $posts = $this->posts->getAll($offset, $limit);
+        $posts = $this->posts->all(
+            $pager->getOffset(),
+            $pager->getLimit()
+        );
 
         return new HtmlResponse($this->template->render('app/blog/index', [
             'posts' => $posts,
-            'page' => $page,
-            'count' => $count,
+            'pager' => $pager,
         ]));
     }
 }

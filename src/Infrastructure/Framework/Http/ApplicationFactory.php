@@ -7,7 +7,6 @@ use Framework\Http\Application;
 use Framework\Http\Pipeline\MiddlewareResolver;
 use Framework\Http\Router\Router;
 use Psr\Container\ContainerInterface;
-use Zend\Diactoros\Response;
 
 class ApplicationFactory
 {
@@ -16,8 +15,7 @@ class ApplicationFactory
         return new Application(
             $container->get(MiddlewareResolver::class),
             $container->get(Router::class),
-            $container->get(NotFoundHandler::class),
-            new Response()
+            $container->get(NotFoundHandler::class)
         );
     }
 }

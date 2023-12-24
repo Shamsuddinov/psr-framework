@@ -10,12 +10,10 @@ class ErrorHandlerMiddlewareFactory
 {
     public function __invoke(ContainerInterface $container)
     {
-        $middleware = new ErrorHandlerMiddleware(
+        $middleware =  new ErrorHandlerMiddleware(
             $container->get(ErrorResponseGenerator::class)
         );
-
         $middleware->addListener($container->get(LogErrorListener::class));
-
         return $middleware;
     }
 }

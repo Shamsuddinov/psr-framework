@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Http\Action;
 
 use Framework\Template\TemplateRenderer;
@@ -16,7 +17,7 @@ class AboutAction implements RequestHandlerInterface
         $this->template = $template;
     }
 
-    public function handle(ServerRequestInterface $request):ResponseInterface
+    public function handle(ServerRequestInterface $request): ResponseInterface
     {
         return new HtmlResponse($this->template->render('app/about'));
     }

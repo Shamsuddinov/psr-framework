@@ -20,14 +20,16 @@ class ResponseLoggerMiddleware implements MiddlewareInterface
     public function process(ServerRequestInterface $request, RequestHandlerInterface $handler): ResponseInterface
     {
         $response = $handler->handle($request);
+
         $code = $response->getStatusCode();
 
-        if ($code >= 400 && $code <= 600) {
+        if ($code >= 400 && $code < 600) {
             $this->logger->error($response->getReasonPhrase(), [
                 'method' => $request->getMethod(),
-                'url' => (string) $request->getUri(),
+                'url' => (string)$request->getUri(),
             ]);
         }
+
         return $response;
     }
 }
